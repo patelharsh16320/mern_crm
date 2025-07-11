@@ -1,0 +1,19 @@
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    c_password VARCHAR(255) NOT NULL,
+    number BIGINT,
+    address VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE ticket (
+    ticket_id INT AUTO_INCREMENT PRIMARY KEY,
+    subject VARCHAR(200) NOT NULL,
+    status ENUM('backlog', 'to_do', 'in_progress', 'On_hold', 'review', 'done') NOT NULL,
+    last_updated TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
