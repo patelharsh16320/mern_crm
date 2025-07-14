@@ -12,7 +12,7 @@ export default function AddSubjectForm() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e) => { 
     e.preventDefault();
     console.log('Submitted:', formData);
     // Add your API call or logic here
