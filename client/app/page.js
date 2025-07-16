@@ -1,41 +1,46 @@
 'use client'
 import { useState, useEffect } from "react"
-import { fetchAllUsers } from './utils/allapi';
+import { fetchAllUsers, fetchAllTicket } from './utils/allapi';
 
 const page = () => {
   const [tabledata, setTabledata] = useState([]);
   const [users, setUsers] = useState([]);
+  const [ticket, setTicket] = useState([]);
 
-useEffect(() => {
-  const getUsers = async () => {
-    try {
-      const data = await fetchAllUsers();
-      setUsers(data.users);
-      console.log('length', data.users.length);
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        const data = await fetchAllUsers();
+        setUsers(data.users);
+        const totalClient = data.users.length;
 
-      setTabledata([
-        { name: 'Total Clients', count: data.users.length },
-        { name: 'Total Tickets', count: 100 },
-        { name: 'Pending Tickets', count: 50 }
-      ]);
+        const dataTicket = await fetchAllTicket();
+        setTicket(dataTicket.users);
+        const totalTicket = dataTicket.users.length;
 
-    } catch (err) {
-      toast.error('Failed to load users');
-    }
-  };
-  getUsers();
-}, []);
+        // Count tickets with status "in_progress"
+        const pendingCount = dataTicket.users.filter(t => t.status === 'in_progress').length;
+
+        setTabledata([
+          { name: 'Total Clients', count: totalClient },
+          { name: 'Total Tickets', count: totalTicket },
+          { name: 'Pending Tickets', count: pendingCount }
+        ]);
+
+      } catch (err) {
+        toast.error('Failed to load users');
+      }
+    };
+    getUsers();
+  }, []);
 
   return (
     <>
       <div className="flex justify-center items-start min-h-screen bg-gray-100 px-4 py-10">
         <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-lg">
-          {/* Heading */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-800">All Details</h1>
           </div>
-
-          {/* Table */}
           <div clasksName="overflow-auto">
             <table className="w-full table-auto border border-gray-300 text-center rounded-lg">
               <thead className="bg-blue-600 text-white uppercase text-sm">

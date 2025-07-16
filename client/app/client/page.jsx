@@ -1,6 +1,6 @@
 'use client'
 import Link from "next/link";
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { fetchAllUsers, deleteUserById, deleteAllUsers } from '../utils/allapi';
 import { toast } from 'react-toastify';
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
@@ -11,18 +11,23 @@ const UsersPage = () => {
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
+  const hasFetched = useRef(false);
+
+  const getUsers = async () => {
+    try {
+      const data = await fetchAllUsers();
+      setUsers(data.users);
+      toast.success('Users loaded successfully');
+    } catch (err) {
+      toast.error('Failed to load users');
+    }
+  };
 
   useEffect(() => {
-    const getUsers = async () => {
-      try {
-        const data = await fetchAllUsers();
-        setUsers(data.users);
-        toast.success('Users loaded successfully');
-      } catch (err) {
-        toast.error('Failed to load users');
-      }
-    };
-    getUsers();
+    if (!hasFetched.current) {
+      getUsers(true);
+      hasFetched.current = true;
+    }
   }, []);
 
   const handleDelete = async (id) => {
@@ -31,7 +36,6 @@ const UsersPage = () => {
     try {
       await deleteUserById(id);
       toast.success("User deleted successfully");
-      // Refresh user list
       setUsers(users.filter(user => user.user_id !== id));
       router.push('/client');
     } catch (error) {
@@ -82,7 +86,7 @@ const UsersPage = () => {
                   try {
                     const res = await deleteAllUsers();
                     toast.success(res.message);
-                    setUsers([]); 
+                    setUsers([]);
                   } catch (err) {
                     toast.error(err.message || "Failed to delete all users");
                   }

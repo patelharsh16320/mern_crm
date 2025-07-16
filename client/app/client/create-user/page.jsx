@@ -85,7 +85,6 @@ const Page = () => {
 
   return (
     <>
-      <ToastContainer />
       <form
         onSubmit={handleSubmit}
         className="max-w-xl mx-auto p-8 mt-10 bg-white rounded-lg shadow-lg space-y-6"

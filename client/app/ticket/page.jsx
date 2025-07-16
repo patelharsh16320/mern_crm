@@ -1,6 +1,6 @@
 'use client'
 import Link from "next/link";
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { fetchAllTicket, deleteTicketById, deleteAllTicket } from '../utils/allapi';
 import { toast } from 'react-toastify';
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
@@ -11,18 +11,22 @@ const TicketPage = () => {
   const [ticket, setTicket] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
+  const hasFetched = useRef(false);
 
+  const getTicket = async (showToast = true) => {
+    try {
+      const data = await fetchAllTicket();
+      setTicket(data.users);
+      if (showToast) toast.success('Tickets loaded successfully');
+    } catch (err) {
+      toast.error('Failed to load tickets');
+    }
+  };
   useEffect(() => {
-    const getTicket = async () => {
-      try {
-        const data = await fetchAllTicket();
-        setTicket(data.users); // Keep this as data.users if your API returns "users"
-        toast.success('Tickets loaded successfully');
-      } catch (err) {
-        toast.error('Failed to load tickets');
-      }
-    };
-    getTicket();
+    if (!hasFetched.current) {
+      getTicket(true);
+      hasFetched.current = true;
+    }
   }, []);
 
   const handleDelete = async (id) => {
