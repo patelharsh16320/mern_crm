@@ -41,3 +41,42 @@ export const createUser = async (formData) => {
         throw err;
     }
 };
+
+//! Update Users 
+export const updateUser = async (formData) => {
+    try {
+        const res = await fetch(`${BASE_URL}/update-user`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: formData.user_id,
+                name: formData.username,
+                email: formData.email,
+                password: formData.password,
+                c_password: formData.c_password,
+                number: formData.phone,
+                address: formData.address,
+                created_at: formData.doj
+            }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to update user');
+        return data;
+    } catch (err) {
+        throw err;
+    }
+};
+
+//! Delete Single User
+export const deleteUserById = async (userId) => {
+    const res = await fetch(`${BASE_URL}/delete-user/${userId}`, {
+        method: 'DELETE',
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to delete user");
+    }
+
+    return await res.json();
+};

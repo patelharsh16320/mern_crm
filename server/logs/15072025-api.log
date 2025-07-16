@@ -111,3 +111,10 @@
 2025-07-15 17:11:02 [INFO]: [User: Guest | ID: NA] POST /create-user - ::1
 2025-07-15 17:11:13 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
 2025-07-15 17:11:13 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-15 17:52:02 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-15 17:52:30 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-15 17:52:47 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-15 17:52:51 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-15 17:52:59 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-15 17:53:04 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-15 17:53:17 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
