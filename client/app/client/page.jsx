@@ -1,7 +1,7 @@
 'use client'
 import Link from "next/link";
 import { useState, useEffect } from "react"
-import { fetchAllUsers, deleteUserById } from '../utils/allapi';
+import { fetchAllUsers, deleteUserById, deleteAllUsers } from '../utils/allapi';
 import { toast } from 'react-toastify';
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
@@ -67,12 +67,32 @@ const UsersPage = () => {
         <div className="w-full max-w-6xl bg-white p-6 rounded-lg shadow-lg">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-800">All Clients</h1>
-            <Link
-              href="/client/create-user"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-            >
-              + New Client
-            </Link>
+            <div className="flex gap-2">
+              <Link
+                href="/client/create-user"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              >
+                + New Client
+              </Link>
+              <button
+                onClick={async () => {
+                  const confirmDelete = confirm("Are you sure you want to delete all users?");
+                  if (!confirmDelete) return;
+
+                  try {
+                    const res = await deleteAllUsers();
+                    toast.success(res.message);
+                    setUsers([]); 
+                  } catch (err) {
+                    toast.error(err.message || "Failed to delete all users");
+                  }
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+              >
+                Delete All
+              </button>
+
+            </div>
           </div>
 
           {users.length === 0 ? (

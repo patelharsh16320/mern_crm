@@ -1,21 +1,30 @@
 'use client'
 import { useState, useEffect } from "react"
+import { fetchAllUsers } from './utils/allapi';
 
 const page = () => {
   const [tabledata, setTabledata] = useState([]);
+  const [users, setUsers] = useState([]);
 
-  const fetchData = () => {
-    const data = [
-      { name: 'Total Clients', count: 25 },
-      { name: 'Total Tickets', count: 100 },
-      { name: 'Pending Tickets', count: 50 }
-    ];
-    setTabledata(data);
-  }
+useEffect(() => {
+  const getUsers = async () => {
+    try {
+      const data = await fetchAllUsers();
+      setUsers(data.users);
+      console.log('length', data.users.length);
 
-  useEffect(() => {
-    fetchData();
-  }, [])
+      setTabledata([
+        { name: 'Total Clients', count: data.users.length },
+        { name: 'Total Tickets', count: 100 },
+        { name: 'Pending Tickets', count: 50 }
+      ]);
+
+    } catch (err) {
+      toast.error('Failed to load users');
+    }
+  };
+  getUsers();
+}, []);
 
   return (
     <>
@@ -27,7 +36,7 @@ const page = () => {
           </div>
 
           {/* Table */}
-          <div className="overflow-auto">
+          <div clasksName="overflow-auto">
             <table className="w-full table-auto border border-gray-300 text-center rounded-lg">
               <thead className="bg-blue-600 text-white uppercase text-sm">
                 <tr>

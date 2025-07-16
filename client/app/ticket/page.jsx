@@ -1,83 +1,199 @@
 'use client'
+import Link from "next/link";
 import { useState, useEffect } from "react"
-import Link from 'next/link'
+import { fetchAllTicket, deleteTicketById, deleteAllTicket } from '../utils/allapi';
+import { toast } from 'react-toastify';
+import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
+import { useRouter } from 'next/navigation';
 
-const page = () => {
-  const [tabledata, setTabledata] = useState([]);
-
-  const fetchData = () => {
-    const data = [
-      { name: 'Biology', Status: 'Backlog', date: '03-04-2025' },
-      { name: 'Geography', Status: 'To Do', date: '11-02-2025' },
-      { name: 'Philosophy', Status: 'Review', date: '25-08-2025' },
-      { name: 'Chemistry', Status: 'Done', date: '19-07-2025' },
-      { name: 'English Literature', Status: 'On Hold', date: '06-01-2025' },
-      { name: 'Political Science', Status: 'In Progress', date: '28-03-2025' },
-      { name: 'Statistics', Status: 'To Do', date: '15-09-2025' },
-      { name: 'Psychology', Status: 'Review', date: '12-11-2025' },
-      { name: 'Sociology', Status: 'Done', date: '07-06-2025' },
-      { name: 'Environmental Science', Status: 'Backlog', date: '21-10-2025' },
-      { name: 'Art History', Status: 'In Progress', date: '30-05-2025' },
-      { name: 'Computer Science', Status: 'On Hold', date: '09-04-2025' },
-      { name: 'Anthropology', Status: 'To Do', date: '16-12-2025' },
-      { name: 'Economics', Status: 'Backlog', date: '03-08-2025' },
-      { name: 'Physics', Status: 'Done', date: '22-07-2025' }
-    ];
-    setTabledata(data);
-  }
+const TicketPage = () => {
+  const router = useRouter();
+  const [ticket, setTicket] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 10;
 
   useEffect(() => {
-    fetchData();
-  }, [])
+    const getTicket = async () => {
+      try {
+        const data = await fetchAllTicket();
+        setTicket(data.users); // Keep this as data.users if your API returns "users"
+        toast.success('Tickets loaded successfully');
+      } catch (err) {
+        toast.error('Failed to load tickets');
+      }
+    };
+    getTicket();
+  }, []);
+
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this Ticket?")) return;
+
+    try {
+      await deleteTicketById(id);
+      toast.success("Ticket deleted successfully");
+      setTicket(ticket.filter(t => t.ticket_id !== id));
+      router.push('/ticket');
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete ticket");
+    }
+  };
+
+  const formatStatus = (status) => {
+    switch (status) {
+      case 'backlog': return 'Backlog';
+      case 'to_do': return 'To Do';
+      case 'in_progress': return 'In Progress';
+      case 'On_hold': return 'On Hold';
+      case 'review': return 'Review';
+      case 'done': return 'Done';
+      default: return status;
+    }
+  };
+
+  // Pagination Logic
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentTickets = ticket.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(ticket.length / usersPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <>
-      <div className='flex justify-center items-start min-h-screen bg-gray-100 px-4 py-10'>
-        <div className="w-full max-w-6xl bg-white p-6 rounded-lg shadow-lg">               
-       <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">All Ticktes</h1>
-            <Link
-              href="/ticket/create-ticket"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-            >
-              + New Ticket
-            </Link>
+      <div className="flex justify-center items-start min-h-screen bg-gray-100 px-4 py-10">
+        <div className="w-full max-w-6xl bg-white p-6 rounded-lg shadow-lg">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-800">All Tickets</h1>
+            <div className="flex gap-2">
+              <Link
+                href="/ticket/create-ticket"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              >
+                + New Ticket
+              </Link>
+              <button
+                onClick={async () => {
+                  const confirmDelete = confirm("Are you sure you want to delete all tickets?");
+                  if (!confirmDelete) return;
+
+                  try {
+                    const res = await deleteAllTicket();
+                    toast.success(res.message);
+                    setTicket([]);
+                  } catch (err) {
+                    toast.error(err.message || "Failed to delete all tickets");
+                  }
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+              >
+                Delete All
+              </button>
+            </div>
           </div>
-          <div className="overflow-auto max-h-[70vh]">
-            <table className="w-full table-auto border border-gray-300 text-left rounded-lg">
-              <thead className="bg-blue-600 text-white uppercase text-sm">
-                <tr>
-                  <th className="px-4 py-2 border border-gray-300">Index</th>
-                  <th className="px-4 py-2 border border-gray-300">Subject</th>
-                  <th className="px-4 py-2 border border-gray-300">Status</th>
-                  <th className="px-4 py-2 border border-gray-300">Last Updated</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tabledata.map((props, index) => (
-                  <tr key={index} className="hover:bg-gray-100 text-gray-700">
-                    <td className="px-4 py-2 border border-gray-300">{index + 1}</td>
-                    <td className="px-4 py-2 border border-gray-300">{props.name}</td>
-                    <td className={`px-4 py-2 border border-gray-300 font-semibold 
-                      ${props.Status === 'Done' ? 'text-green-600' :
-                        props.Status === 'Backlog' ? 'text-red-500' :
-                        props.Status === 'To Do' ? 'text-blue-500' :
-                        props.Status === 'Review' ? 'text-yellow-600' :
-                        props.Status === 'In Progress' ? 'text-purple-600' :
-                        props.Status === 'On Hold' ? 'text-orange-500' : 'text-gray-700'}
-                    `}>
-                      {props.Status}
-                    </td>
-                    <td className="px-4 py-2 border border-gray-300">{props.date}</td>
-                  </tr>
+
+          {ticket.length === 0 ? (
+            <p>No tickets found</p>
+          ) : (
+            <>
+              <div className="overflow-auto">
+                <table className="w-full table-auto border border-gray-300 text-left rounded-lg">
+                  <thead className="bg-blue-600 text-white uppercase text-sm">
+                    <tr>
+                      <th className="px-4 py-2 border">Index</th>
+                      <th className="px-4 py-2 border">Subject</th>
+                      <th className="px-4 py-2 border">Status</th>
+                      <th className="px-4 py-2 border">Last Updated</th>
+                      <th className="px-4 py-2 border">Last Created</th>
+                      <th className="px-4 py-2 border">Edit</th>
+                      <th className="px-4 py-2 border">Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentTickets.map((item, index) => (
+                      <tr key={index} className="hover:bg-gray-100 text-gray-700">
+                        <td className="px-4 py-2 border">{indexOfFirstUser + index + 1}</td>
+                        <td className="px-4 py-2 border">{item.subject}</td>
+                        <td className="px-4 py-2 border">{formatStatus(item.status)}</td>
+                        <td className="px-4 py-2 border">
+                          {new Date(item.last_updated).toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true,
+                          }).replace(',', ' at')}
+                        </td>
+                        <td className="px-4 py-2 border">
+                          {new Date(item.created_at).toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true,
+                          }).replace(',', ' at')}
+                        </td>
+                        <td className="px-4 py-2 border">
+                          <button
+                            onClick={() => {
+                              localStorage.setItem('editTicket', JSON.stringify(item));
+                              router.push('/ticket/create-ticket');
+                            }}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            <FaEdit />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2 border">
+                          <button
+                            onClick={() => handleDelete(item.ticket_id)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <FaRegTrashAlt />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="flex justify-center mt-6 space-x-2">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                >
+                  Prev
+                </button>
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => paginate(i + 1)}
+                    className={`px-3 py-1 rounded ${currentPage === i + 1
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 hover:bg-gray-300"
+                      }`}
+                  >
+                    {i + 1}
+                  </button>
                 ))}
-              </tbody>
-            </table>
-          </div>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>
-  ) 
-}
+  );
+};
 
-export default page;
+export default TicketPage;
