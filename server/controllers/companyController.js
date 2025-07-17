@@ -12,10 +12,10 @@ const createUser = async (req, res) => {
         if (password !== c_password) {
             return res.json({ message: 'passoword & confirm password are not same!...' })
         }
-        const createdAt = new Date();
 
-        const sql = "INSERT INTO users(name, email, password, c_password, number, address, created_at) VALUES (?,?,?,?,?,?,?)";
-        const value = [name, email, password, c_password, number, address, createdAt];
+        const sql = "INSERT INTO users(name, email, password, c_password, number, address, created_at) VALUES (?,?,?,?,?,?,NOW())";
+
+        const value = [name, email, password, c_password, number, address];
 
         conn.query(sql, value, (err, result) => {
             if (err) {

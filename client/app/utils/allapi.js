@@ -4,83 +4,83 @@ const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API
 
 // Fetch All Api 
 export const fetchAllUsers = async () => {
-    try {
-        const res = await fetch(`${BASE_URL}/show-users`, {
-            method: 'GET',
-            cache: 'no-store',
-        });
-        if (!res.ok) throw new Error('Failed to fetch users');
-        const data = await res.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching users: ', error.message);
-        throw error
-    }
+  try {
+    const res = await fetch(`${BASE_URL}/show-users`, {
+      method: 'GET',
+      cache: 'no-store',
+    });
+    if (!res.ok) throw new Error('Failed to fetch users');
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching users: ', error.message);
+    throw error
+  }
 }
 
 // Create New Users 
 export const createUser = async (formData) => {
-    try {
-        const res = await fetch(`${BASE_URL}/create-user`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: formData.username,
-                email: formData.email,
-                number: formData.phone,
-                doj: formData.doj,
-                address: formData.address,
-                password: "123456",
-                c_password: "123456"
-            }),
-        });
+  try {
+    const res = await fetch(`${BASE_URL}/create-user`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: formData.username,
+        email: formData.email,
+        number: formData.phone,
+        doj: formData.doj,
+        address: formData.address,
+        password: "123456",
+        c_password: "123456"
+      }),
+    });
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Failed to create user');
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to create user');
 
-        return data;
-    } catch (err) {
-        throw err;
-    }
+    return data;
+  } catch (err) {
+    throw err;
+  }
 };
 
 // Update Users 
 export const updateUser = async (formData) => {
-    try {
-        const res = await fetch(`${BASE_URL}/update-user`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user_id: formData.user_id,
-                name: formData.username,
-                email: formData.email,
-                password: formData.password,
-                c_password: formData.c_password,
-                number: formData.phone,
-                address: formData.address,
-                created_at: formData.doj
-            }),
-        });
+  try {
+    const res = await fetch(`${BASE_URL}/update-user`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: formData.user_id,
+        name: formData.username,
+        email: formData.email,
+        password: formData.password,
+        c_password: formData.c_password,
+        number: formData.phone,
+        address: formData.address,
+        created_at: formData.doj
+      }),
+    });
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Failed to update user');
-        return data;
-    } catch (err) {
-        throw err;
-    }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to update user');
+    return data;
+  } catch (err) {
+    throw err;
+  }
 };
 
 // Delete Single User
 export const deleteUserById = async (userId) => {
-    const res = await fetch(`${BASE_URL}/delete-user/${userId}`, {
-        method: 'DELETE',
-    });
+  const res = await fetch(`${BASE_URL}/delete-user/${userId}`, {
+    method: 'DELETE',
+  });
 
-    if (!res.ok) {
-        throw new Error("Failed to delete user");
-    }
+  if (!res.ok) {
+    throw new Error("Failed to delete user");
+  }
 
-    return await res.json();
+  return await res.json();
 };
 
 // Delete All User
@@ -99,18 +99,18 @@ export const deleteAllUsers = async () => {
 //! For Ticket Start
 // Fetch All Api 
 export const fetchAllTicket = async () => {
-    try {
-        const res = await fetch(`${BASE_URL}/show-ticket`, {
-            method: 'GET',
-            cache: 'no-store',
-        });
-        if (!res.ok) throw new Error('Failed to fetch ticket');
-        const data = await res.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching ticket: ', error.message);
-        throw error
-    }
+  try {
+    const res = await fetch(`${BASE_URL}/show-ticket`, {
+      method: 'GET',
+      cache: 'no-store',
+    });
+    if (!res.ok) throw new Error('Failed to fetch ticket');
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching ticket: ', error.message);
+    throw error
+  }
 }
 
 // Create New Users 
@@ -151,15 +151,15 @@ export const updateTicketById = async (ticketData) => {
 
 // Delete Single User
 export const deleteTicketById = async (ticketId) => {
-    const res = await fetch(`${BASE_URL}/delete-ticket/${ticketId}`, {
-        method: 'DELETE',
-    });
+  const res = await fetch(`${BASE_URL}/delete-ticket/${ticketId}`, {
+    method: 'DELETE',
+  });
 
-    if (!res.ok) {
-        throw new Error("Failed to delete user");
-    }
+  if (!res.ok) {
+    throw new Error("Failed to delete user");
+  }
 
-    return await res.json();
+  return await res.json();
 };
 
 // Delete All User

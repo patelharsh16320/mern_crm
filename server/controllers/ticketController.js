@@ -39,7 +39,6 @@ const createTicket = async (req, res) => {
     }
 };
 
-
 // update new ticket 
 const updateTicket = async (req, res) => {
     try {
@@ -53,13 +52,7 @@ const updateTicket = async (req, res) => {
             return res.status(400).json({ message: "Invalid status value" });
         }
 
-        const sql = `
-      UPDATE ticket SET 
-        subject = ?, 
-        status = ?, 
-        last_updated = NOW() 
-      WHERE ticket_id = ?
-    `;
+        const sql = `UPDATE ticket SET subject = ?, status = ?, last_updated = NOW() WHERE ticket_id = ?`;
         const values = [subject, status, ticket_id];
 
         conn.query(sql, values, (err, result) => {
@@ -85,7 +78,6 @@ const updateTicket = async (req, res) => {
         });
     }
 };
-
 
 // Delete ticket
 const deleteTicket = async (req, res) => {

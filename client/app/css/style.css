@@ -1,4 +1,10 @@
-body table tr th, body table tr td {
+body table tr th,
+body table tr td {
   border: 1px solid #000 !important;
   padding: 1rem;
+}
+body button {
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: 1px solid;
 }/*# sourceMappingURL=style.css.map */

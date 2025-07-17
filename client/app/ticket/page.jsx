@@ -1,67 +1,119 @@
-'use client'
-import Link from "next/link";
-import { useState, useEffect, useRef } from "react"
-import { fetchAllTicket, deleteTicketById, deleteAllTicket } from '../utils/allapi';
-import { toast } from 'react-toastify';
-import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
-import { useRouter } from 'next/navigation';
+'use client';
 
-const TicketPage = () => {
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { toast } from 'react-toastify';
+import { FaEdit } from 'react-icons/fa';
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { fetchAllTicket, deleteTicketById, deleteAllTicket } from '../utils/allapi';
+
+const statusLabelMap = {
+    backlog: 'Backlog',
+    to_do: 'To Do',
+    in_progress: 'In Progress',
+    On_hold: 'On Hold',
+    review: 'Review',
+    done: 'Done',
+};
+
+export default function AllTickets() {
   const router = useRouter();
   const [ticket, setTicket] = useState([]);
+  const [statusSummary, setStatusSummary] = useState([]);
+  const [filteredTickets, setFilteredTickets] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
+
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
-  const hasFetched = useRef(false);
 
-  const getTicket = async (showToast = true) => {
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentTickets = filteredTickets.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredTickets.length / usersPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const formatStatus = (status) => statusLabelMap[status] || status;
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [ticket, selectedStatus, sortConfig]);
+
+  const fetchData = async () => {
     try {
       const data = await fetchAllTicket();
       setTicket(data.users);
+      calculateStatusSummary(data.users || []);
+
       if (showToast) toast.success('Tickets loaded successfully');
     } catch (err) {
       toast.error('Failed to load tickets');
     }
   };
-  useEffect(() => {
-    if (!hasFetched.current) {
-      getTicket(true);
-      hasFetched.current = true;
+
+  const calculateStatusSummary = (data) => {
+    const summary = data.reduce((acc, ticket) => {
+      acc[ticket.status] = (acc[ticket.status] || 0) + 1;
+      return acc;
+    }, {});
+    const summaryArray = Object.entries(summary).map(([status, count]) => ({
+      status,
+      count,
+    }));
+    setStatusSummary(summaryArray);
+  };
+
+  const handleStatusChange = (status) => {
+    setSelectedStatus(status);
+    setCurrentPage(1);
+  };
+
+  const applyFilters = () => {
+    let tempTickets = [...ticket];
+
+    if (selectedStatus) {
+      tempTickets = tempTickets.filter(t => t.status === selectedStatus);
     }
-  }, []);
 
-  const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this Ticket?")) return;
+    if (sortConfig.key) {
+      tempTickets.sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
 
+    setFilteredTickets(tempTickets);
+  };
+
+  const requestSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const handleDelete = async (ticket_id) => {
+    const confirmDelete = confirm("Are you sure you want to delete this ticket?");
+    if (!confirmDelete) return;
     try {
-      await deleteTicketById(id);
-      toast.success("Ticket deleted successfully");
-      setTicket(ticket.filter(t => t.ticket_id !== id));
-      router.push('/ticket');
-    } catch (error) {
-      console.error("Delete error:", error);
-      toast.error("Failed to delete ticket");
+      const res = await deleteTicketById(ticket_id);
+      toast.success(res.message);
+      fetchData();
+    } catch (err) {
+      toast.error(err.message || "Failed to delete ticket");
     }
   };
 
-  const formatStatus = (status) => {
-    switch (status) {
-      case 'backlog': return 'Backlog';
-      case 'to_do': return 'To Do';
-      case 'in_progress': return 'In Progress';
-      case 'On_hold': return 'On Hold';
-      case 'review': return 'Review';
-      case 'done': return 'Done';
-      default: return status;
-    }
-  };
-
-  // Pagination Logic
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentTickets = ticket.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(ticket.length / usersPerPage);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <>
@@ -69,6 +121,25 @@ const TicketPage = () => {
         <div className="w-full max-w-6xl bg-white p-6 rounded-lg shadow-lg">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-800">All Tickets</h1>
+            <div className="mb-6">
+              <label htmlFor="statusDropdown" className="block mb-2 text-sm font-medium text-gray-700">
+                Filter by Status
+              </label>
+              <div className="mb-4">
+                <select
+                  id="statusDropdown"
+                  className="block w-full max-w-xs p-2 border border-gray-300 rounded-md text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                >
+                  <option value="">All Statuses</option>
+                  {statusSummary.map(({ status, count }) => (
+                    <option key={status} value={status}>
+                      {`${statusLabelMap[status]} (${count})`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <div className="flex gap-2">
               <Link
                 href="/ticket/create-ticket"
@@ -80,7 +151,6 @@ const TicketPage = () => {
                 onClick={async () => {
                   const confirmDelete = confirm("Are you sure you want to delete all tickets?");
                   if (!confirmDelete) return;
-
                   try {
                     const res = await deleteAllTicket();
                     toast.success(res.message);
@@ -96,7 +166,7 @@ const TicketPage = () => {
             </div>
           </div>
 
-          {ticket.length === 0 ? (
+          {filteredTickets.length === 0 ? (
             <p>No tickets found</p>
           ) : (
             <>
@@ -104,11 +174,21 @@ const TicketPage = () => {
                 <table className="w-full table-auto border border-gray-300 text-left rounded-lg">
                   <thead className="bg-blue-600 text-white uppercase text-sm">
                     <tr>
-                      <th className="px-4 py-2 border">Index</th>
-                      <th className="px-4 py-2 border">Subject</th>
-                      <th className="px-4 py-2 border">Status</th>
-                      <th className="px-4 py-2 border">Last Updated</th>
-                      <th className="px-4 py-2 border">Last Created</th>
+                      <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('index')}>
+                        Index {sortConfig.key === 'index' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('subject')}>
+                        Subject {sortConfig.key === 'subject' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('status')}>
+                        Status {sortConfig.key === 'status' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('last_updated')}>
+                        Last Updated {sortConfig.key === 'last_updated' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('created_at')}>
+                        Last Created {sortConfig.key === 'created_at' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                      </th>
                       <th className="px-4 py-2 border">Edit</th>
                       <th className="px-4 py-2 border">Delete</th>
                     </tr>
@@ -198,6 +278,4 @@ const TicketPage = () => {
       </div>
     </>
   );
-};
-
-export default TicketPage;
+}

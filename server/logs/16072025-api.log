@@ -404,3 +404,10 @@
 2025-07-16 17:36:07 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
 2025-07-16 17:36:08 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1
 2025-07-16 17:37:02 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-16 17:47:05 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1
+2025-07-16 17:47:10 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-16 17:47:10 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-16 17:47:10 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1
+2025-07-16 17:47:10 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1
+2025-07-16 17:47:26 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-16 17:47:54 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1

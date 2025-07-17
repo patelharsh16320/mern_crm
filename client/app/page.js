@@ -24,7 +24,7 @@ const page = () => {
         setTabledata([
           { name: 'Total Clients', count: totalClient },
           { name: 'Total Tickets', count: totalTicket },
-          { name: 'Pending Tickets', count: pendingCount }
+          { name: 'In Progress Tickets', count: pendingCount }
         ]);
 
       } catch (err) {

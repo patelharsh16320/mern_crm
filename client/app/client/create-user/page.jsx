@@ -13,8 +13,8 @@ const Page = () => {
     username: '',
     email: '',
     phone: '',
-    doj: '',
-    address: ''
+    address: '',
+    created_at: '' // This will store DOJ internally
   });
 
   const [isUpdate, setIsUpdate] = useState(false);
@@ -22,8 +22,7 @@ const Page = () => {
   const tabledata = [
     { label: 'Username', name: 'username', type: 'text' },
     { label: 'Email', name: 'email', type: 'email' },
-    { label: 'Phone', name: 'phone', type: 'number' },
-    { label: 'Date of Join', name: 'doj', type: 'date' }
+    { label: 'Phone', name: 'phone', type: 'number' }
   ];
 
   const handleChange = (e) => {
@@ -43,7 +42,9 @@ const Page = () => {
         result = await updateUser(formData);
         toast.success('User updated successfully!');
       } else {
-        result = await createUser(formData);
+        // Add current datetime as created_at
+        const currentDateTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        result = await createUser({ ...formData, created_at: currentDateTime });
         toast.success('User created successfully!');
       }
 
@@ -52,12 +53,12 @@ const Page = () => {
         username: '',
         email: '',
         phone: '',
-        doj: '',
-        address: ''
+        address: '',
+        created_at: ''
       });
 
       setTimeout(() => {
-        router.push('/');
+        router.push('/client');
       }, 1500);
 
     } catch (err) {
@@ -74,14 +75,13 @@ const Page = () => {
         username: user.name,
         email: user.email,
         phone: user.number,
-        doj: new Date(user.created_at).toISOString().slice(0, 10),
-        address: user.address
+        address: user.address,
+        created_at: user.created_at
       });
       setIsUpdate(true);
       localStorage.removeItem('editUser');
     }
   }, []);
-
 
   return (
     <>
@@ -105,7 +105,7 @@ const Page = () => {
             />
           </div>
         ))}
-
+        
         <div className="flex flex-col">
           <label htmlFor="address" className="mb-1 text-sm font-medium text-gray-700">
             Address
@@ -119,12 +119,22 @@ const Page = () => {
             className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        
+        {!isUpdate && (
+          <input
+            type="hidden"
+            name="created_at"
+            value={new Date().toISOString().slice(0, 19).replace('T', ' ')}
+          />
+        )}
 
         <div className="flex justify-between pt-4">
           <button
             type="button"
             onClick={() => {
-              setFormData({ user_id: '', username: '', email: '', phone: '', doj: '', address: '' });
+              setFormData({
+                user_id: '', username: '', email: '', phone: '', address: '', created_at: ''
+              });
               setIsUpdate(false);
               router.push('/client');
             }}
@@ -132,7 +142,6 @@ const Page = () => {
           >
             Cancel
           </button>
-
 
           <button
             type="submit"
@@ -142,6 +151,8 @@ const Page = () => {
           </button>
         </div>
       </form>
+
+      <ToastContainer />
     </>
   );
 };
