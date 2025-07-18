@@ -22,7 +22,9 @@ const Page = () => {
   const tabledata = [
     { label: 'Username', name: 'username', type: 'text' },
     { label: 'Email', name: 'email', type: 'email' },
-    { label: 'Phone', name: 'phone', type: 'number' }
+    { label: 'Phone', name: 'phone', type: 'number' },
+    { label: 'Password', name: 'password', type: 'password' },
+    { label: 'Confirm Password', name: 'c_password', type: 'password' }
   ];
 
   const handleChange = (e) => {
@@ -53,6 +55,8 @@ const Page = () => {
         username: '',
         email: '',
         phone: '',
+        password: '',
+        c_password: '',
         address: '',
         created_at: ''
       });
@@ -76,6 +80,8 @@ const Page = () => {
         email: user.email,
         phone: user.number,
         address: user.address,
+        password: user.password,
+        c_password: user.c_password,
         created_at: user.created_at
       });
       setIsUpdate(true);

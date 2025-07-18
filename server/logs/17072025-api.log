@@ -190,3 +190,12 @@
 2025-07-17 15:23:07 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1
 2025-07-17 15:24:36 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1
 2025-07-17 15:30:00 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1
+2025-07-17 16:11:12 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-17 16:34:15 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-17 16:50:29 [INFO]: [User: Guest | ID: NA] POST /create-user - ::1
+2025-07-17 16:50:34 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-17 16:54:31 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1
+2025-07-17 16:54:31 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1
+2025-07-17 16:54:32 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-17 16:54:51 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1
+2025-07-17 16:54:51 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1
