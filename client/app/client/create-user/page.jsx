@@ -14,7 +14,7 @@ const Page = () => {
     email: '',
     phone: '',
     address: '',
-    created_at: '' // This will store DOJ internally
+    created_at: ''
   });
 
   const [isUpdate, setIsUpdate] = useState(false);
@@ -139,7 +139,7 @@ const Page = () => {
             type="button"
             onClick={() => {
               setFormData({
-                user_id: '', username: '', email: '', phone: '', address: '', created_at: ''
+                user_id: '', username: '', email: '', phone: '',password:'', c_password: '', address: '', created_at: ''
               });
               setIsUpdate(false);
               router.push('/client');

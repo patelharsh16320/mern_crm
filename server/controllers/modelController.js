@@ -6,7 +6,8 @@ const getAllRecords = async (req, res) => {
         const tableName = req.params.table;
         const validTables = [
             'users',
-            'ticket'
+            'ticket',
+            'role'
         ];
 
         if (!validTables.includes(tableName)) {

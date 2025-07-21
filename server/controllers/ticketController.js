@@ -28,9 +28,9 @@ const createTicket = async (req, res) => {
             }
 
             return res.json({
-                message: "Ticket created successfully",
+                message: "Ticket created successfully....",
                 statusCode: 201,
-                ticket_id: result.insertId, // return auto-incremented ID
+                ticket_id: result.insertId,
             });
         });
     } catch (error) {
@@ -68,7 +68,7 @@ const updateTicket = async (req, res) => {
                 return res.status(404).json({ message: "Ticket not found" });
             }
 
-            return res.json({ message: "Ticket updated successfully.", statusCode: 200 });
+            return res.json({ message: "Ticket updated successfully....", statusCode: 200 });
         });
     } catch (error) {
         return res.json({

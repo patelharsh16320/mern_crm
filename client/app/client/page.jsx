@@ -12,6 +12,7 @@ const UsersPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
   const hasFetched = useRef(false);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
   const getUsers = async () => {
     try {
@@ -30,6 +31,18 @@ const UsersPage = () => {
     }
   }, []);
 
+  const sortedUsers = [...users].sort((a, b) => {
+    if (!sortConfig.key) return 0;
+
+    const aVal = a[sortConfig.key]?.toString().toLowerCase();
+    const bVal = b[sortConfig.key]?.toString().toLowerCase();
+
+    if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
@@ -44,26 +57,30 @@ const UsersPage = () => {
     }
   };
 
-  const [editingUser, setEditingUser] = useState(null);
-  const [editFormData, setEditFormData] = useState({
-    user_id: '',
-    username: '',
-    email: '',
-    password: '',
-    c_password: '',
-    phone: '',
-    address: '',
-    doj: '',
-  });
-
+  const columns = [
+    { label: 'Index' },
+    { key: 'name', label: 'Name' },
+    { key: 'email', label: 'Email' },
+    { key: 'number', label: 'Phone' },
+    { key: 'created_at', label: 'Date of Join' },
+    { key: 'address', label: 'Address' },
+    { label: 'Edit' },
+    { label: 'Delete' }
+  ]
 
   // Pagination Logic
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
   const totalPages = Math.ceil(users.length / usersPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
 
   return (
     <>
@@ -107,15 +124,20 @@ const UsersPage = () => {
                 <table className="w-full table-auto border border-gray-300 text-left rounded-lg">
                   <thead className="bg-blue-600 text-white uppercase text-sm">
                     <tr>
-                      <th className="px-4 py-2 border">Index</th>
-                      <th className="px-4 py-2 border">Name</th>
-                      <th className="px-4 py-2 border">Email</th>
-                      <th className="px-4 py-2 border">Phone</th>
-                      <th className="px-4 py-2 border">Date of Join</th>
-                      <th className="px-4 py-2 border">Address</th>
-                      <th className="px-4 py-2 border">Edit</th>
-                      <th className="px-4 py-2 border">Delete</th>
+                      {columns.map((col, idx) => (
+                        <th
+                          key={idx}
+                          className={`px-4 py-2 border ${col.key ? 'cursor-pointer' : ''}`}
+                          onClick={col.key ? () => handleSort(col.key) : undefined}
+                        >
+                          {col.label}
+                          {col.key === sortConfig.key && (
+                            <span> {sortConfig.direction === 'asc' ? '▲' : '▼'}</span>
+                          )}
+                        </th>
+                      ))}
                     </tr>
+
                   </thead>
                   <tbody>
                     {currentUsers.map((user, index) => (

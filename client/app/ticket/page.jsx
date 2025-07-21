@@ -9,12 +9,12 @@ import { FaRegTrashAlt } from 'react-icons/fa';
 import { fetchAllTicket, deleteTicketById, deleteAllTicket } from '../utils/allapi';
 
 const statusLabelMap = {
-    backlog: 'Backlog',
-    to_do: 'To Do',
-    in_progress: 'In Progress',
-    On_hold: 'On Hold',
-    review: 'Review',
-    done: 'Done',
+  backlog: 'Backlog',
+  to_do: 'To Do',
+  in_progress: 'In Progress',
+  On_hold: 'On Hold',
+  review: 'Review',
+  done: 'Done',
 };
 
 export default function AllTickets() {
@@ -51,7 +51,8 @@ export default function AllTickets() {
       setTicket(data.users);
       calculateStatusSummary(data.users || []);
 
-      if (showToast) toast.success('Tickets loaded successfully');
+      // if (showToast) toast.success('Tickets loaded successfully');
+      toast.success('Tickets loaded successfully')
     } catch (err) {
       toast.error('Failed to load tickets');
     }
@@ -118,9 +119,9 @@ export default function AllTickets() {
     <>
       <div className="flex justify-center items-start min-h-screen bg-gray-100 px-4 py-10">
         <div className="w-full max-w-6xl bg-white p-6 rounded-lg shadow-lg">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-800">All Tickets</h1>
-            <div className="mb-6">
+            <div className="">
               <label htmlFor="statusDropdown" className="block mb-2 text-sm font-medium text-gray-700">
                 Filter by Status
               </label>

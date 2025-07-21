@@ -1,11 +1,13 @@
-'use client'
-import { useState } from 'react'
+'use client';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { LoginUser } from '../utils/allapi';
+import { toast } from 'react-toastify';
 
 export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   });
 
@@ -15,15 +17,31 @@ export default function LoginPage() {
   };
 
   const handleReset = () => {
-    setFormData({ username: '', password: '' });
+    setFormData({ email: '', password: '' });
   };
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log('Login Data:', formData);
-    // 🔐 Add login API call here
-        router.push('/');
-  };
+const handleLogin = async (e) => {
+  e.preventDefault();
+  try {
+    const data = await LoginUser(formData);
+
+    if (data.statusCode === 200) {
+      localStorage.setItem('user', JSON.stringify(data.user));
+      toast.success(data.message || 'Login successful');
+      router.push('/');
+    } else if (data.statusCode === 401 || data.statusCode === 404) {
+      toast.error(data.message || 'Invalid email or password');
+    } else if (data.statusCode === 400) {
+      toast.warn(data.message || 'Missing credentials');
+    } else {
+      toast.error(data.message || 'Unexpected error');
+    }
+
+  } catch (err) {
+    toast.error('Server error. Please try again.');
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
@@ -31,17 +49,17 @@ export default function LoginPage() {
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              Username
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
             </label>
             <input
               type="email"
-              id="username"
-              name="username"
-              value={formData.username}
+              id="email"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
               required
-              placeholder="Enter your username"
+              placeholder="Enter your email"
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -71,7 +89,7 @@ export default function LoginPage() {
               Reset
             </button>
             <button
-              type="submit" 
+              type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
               Login
@@ -80,5 +98,5 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
-  )
+  );
 }

@@ -31,7 +31,7 @@ const createUser = async (req, res) => {
 // update new User 
 const updateUser = async (req, res) => {
     try {
-        const { user_id, name, email, password, c_password, number, address, created_at } = req.body;       
+        const { user_id, name, email, password, c_password, number, address, created_at } = req.body;
         if (!user_id) { return res.json({ message: "User ID and name are required", statusCode: 400 }); }
 
         const sql = `UPDATE users SET 
@@ -89,9 +89,50 @@ const deleteAllUsers = async (req, res) => {
     }
 }
 
+// For login
+const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email & Password are required', statusCode: 400 });
+        }
+
+        const sql = `SELECT * FROM users WHERE email = ? LIMIT 1`;
+
+        conn.query(sql, [email], (err, result) => {
+            if (err) {
+                return res.status(500).json({ message: 'DB Error', statusCode: 500 });
+            }
+
+            if (result.length === 0) {
+                return res.status(404).json({ message: 'User not found', statusCode: 404 });
+            }
+
+            const user = result[0];
+
+            if (user.password !== password) {
+                return res.status(401).json({ message: 'Invalid credentials', statusCode: 401 });
+            }
+
+            return res.status(200).json({
+                message: 'Login Successful',
+                statusCode: 200,
+                user: {
+                    user_id: user.user_id,
+                    name: user.name,
+                    email: user.email,
+                    number: user.number,
+                },
+            });
+        });
+
+    } catch (err) {
+        return res.status(500).json({ message: 'Internal server error', statusCode: 500 });
+    }
+}
+
 //! *************** User API End 
 
-
 module.exports = {
-    createUser, updateUser, deleteUser, deleteAllUsers
+    createUser, updateUser, deleteUser, deleteAllUsers, loginUser
 };

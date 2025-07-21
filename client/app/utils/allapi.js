@@ -113,7 +113,7 @@ export const fetchAllTicket = async () => {
   }
 }
 
-// Create New Users 
+// Create New Ticket 
 export const createNewTicket = async (ticketData) => {
   try {
     const response = await fetch(`${BASE_URL}/create-ticket`, {
@@ -149,7 +149,7 @@ export const updateTicketById = async (ticketData) => {
   return data;
 };
 
-// Delete Single User
+// Delete Single Ticket
 export const deleteTicketById = async (ticketId) => {
   const res = await fetch(`${BASE_URL}/delete-ticket/${ticketId}`, {
     method: 'DELETE',
@@ -162,7 +162,7 @@ export const deleteTicketById = async (ticketId) => {
   return await res.json();
 };
 
-// Delete All User
+// Delete All Ticket
 export const deleteAllTicket = async () => {
   const res = await fetch(`${BASE_URL}/delete-allticket`, {
     method: 'DELETE',
@@ -175,3 +175,72 @@ export const deleteAllTicket = async () => {
 
 
 //! For Ticket End
+
+//! For User Login/Logout Start
+
+// Login User
+export const LoginUser = async (loginData) => {
+  const res = await fetch(`${BASE_URL}/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(loginData),
+  });
+
+  const data = await res.json();
+
+  return data;
+};
+//! For User Login/Logout End
+
+//! For Role Start
+// Role Define
+export const allRoles = async (loginData) => {
+  const res = await fetch(`${BASE_URL}/show-role`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(loginData),
+  });
+  const data = await res.json();
+  return data;
+};
+
+// Update Role
+export const updateUserRole = async (payload) => {
+  const res = await fetch(`${BASE_URL}/update-role`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return res.json();
+};
+
+// Delete Single role
+export const deleteRoleById = async (roleId) => {
+  const res = await fetch(`${BASE_URL}/delete-role/${roleId}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to delete user");
+  }
+
+  return await res.json();
+};
+
+// Delete All Ticket
+export const deleteAllRole = async () => {
+  const res = await fetch(`${BASE_URL}/delete-allrole`, {
+    method: 'DELETE',
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to delete all ticket');
+  return data;
+};
+
+
+//! For Role End
