@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { FaEdit } from 'react-icons/fa';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { fetchAllTicket, deleteTicketById, deleteAllTicket } from '../utils/allapi';
+import { useSortable } from '../component/page'
 
 const statusLabelMap = {
   backlog: 'Backlog',
@@ -23,27 +24,40 @@ export default function AllTickets() {
   const [statusSummary, setStatusSummary] = useState([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
-
+  const { sortedData, sortConfig, handleSort } = useSortable(ticket);
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
-
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentTickets = filteredTickets.slice(indexOfFirstUser, indexOfLastUser);
   const totalPages = Math.ceil(filteredTickets.length / usersPerPage);
-
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
   const formatStatus = (status) => statusLabelMap[status] || status;
+
+  
+  const columns = [
+    { label: 'Index' },
+    { key: 'subject', label: 'Subject' },
+    { key: 'status', label: 'Status' },
+    { key: 'Last Updated', label: 'last_updated' },
+    { key: 'Created At', label: 'created_at' },
+    { label: 'Edit' },
+    { label: 'Delete' }
+  ]
 
   useEffect(() => {
     fetchData();
   }, []);
 
   useEffect(() => {
-    applyFilters();
-  }, [ticket, selectedStatus, sortConfig]);
+    let temp = [...sortedData];
+
+    if (selectedStatus) {
+      temp = temp.filter(t => t.status === selectedStatus);
+    }
+
+    setFilteredTickets(temp);
+  }, [sortedData, selectedStatus]);
 
   const fetchData = async () => {
     try {
@@ -51,7 +65,6 @@ export default function AllTickets() {
       setTicket(data.users);
       calculateStatusSummary(data.users || []);
 
-      // if (showToast) toast.success('Tickets loaded successfully');
       toast.success('Tickets loaded successfully')
     } catch (err) {
       toast.error('Failed to load tickets');
@@ -73,34 +86,6 @@ export default function AllTickets() {
   const handleStatusChange = (status) => {
     setSelectedStatus(status);
     setCurrentPage(1);
-  };
-
-  const applyFilters = () => {
-    let tempTickets = [...ticket];
-
-    if (selectedStatus) {
-      tempTickets = tempTickets.filter(t => t.status === selectedStatus);
-    }
-
-    if (sortConfig.key) {
-      tempTickets.sort((a, b) => {
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
-        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-      });
-    }
-
-    setFilteredTickets(tempTickets);
-  };
-
-  const requestSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
   };
 
   const handleDelete = async (ticket_id) => {
@@ -174,12 +159,13 @@ export default function AllTickets() {
                 <table className="w-full table-auto border border-gray-300 text-left rounded-lg">
                   <thead className="bg-blue-600 text-white uppercase text-sm">
                     <tr>
-                      <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('index')}>
+                      {/* <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('index')}>
                         Index {sortConfig.key === 'index' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
                       </th>
-                      <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('subject')}>
+                      <th className="px-4 py-2 border cursor-pointer" onClick={() => handleSort('subject')}>
                         Subject {sortConfig.key === 'subject' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
                       </th>
+
                       <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('status')}>
                         Status {sortConfig.key === 'status' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
                       </th>
@@ -187,10 +173,22 @@ export default function AllTickets() {
                         Last Updated {sortConfig.key === 'last_updated' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
                       </th>
                       <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('created_at')}>
-                        Last Created {sortConfig.key === 'created_at' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                        Created Created {sortConfig.key === 'created_at' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
                       </th>
                       <th className="px-4 py-2 border">Edit</th>
-                      <th className="px-4 py-2 border">Delete</th>
+                      <th className="px-4 py-2 border">Delete</th> */}
+                             {columns.map((col, idx) => (
+                        <th
+                          key={idx}
+                          className={`px-4 py-2 border ${col.key ? 'cursor-pointer' : ''}`}
+                          onClick={col.key ? () => handleSort(col.key) : undefined}
+                        >
+                          {col.label}
+                          {col.key === sortConfig.key && (
+                            <span> {sortConfig.direction === 'asc' ? '▲' : '▼'}</span>
+                          )}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>

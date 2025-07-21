@@ -5,6 +5,7 @@ import { fetchAllUsers, deleteUserById, deleteAllUsers } from '../utils/allapi';
 import { toast } from 'react-toastify';
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
+import { useSortable } from '../component/page';
 
 const UsersPage = () => {
   const router = useRouter();
@@ -12,7 +13,7 @@ const UsersPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
   const hasFetched = useRef(false);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const { sortedData: sortedUsers, sortConfig, handleSort } = useSortable(users);
 
   const getUsers = async () => {
     try {
@@ -30,18 +31,6 @@ const UsersPage = () => {
       hasFetched.current = true;
     }
   }, []);
-
-  const sortedUsers = [...users].sort((a, b) => {
-    if (!sortConfig.key) return 0;
-
-    const aVal = a[sortConfig.key]?.toString().toLowerCase();
-    const bVal = b[sortConfig.key]?.toString().toLowerCase();
-
-    if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
-    if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
-    return 0;
-  });
-
 
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
@@ -75,12 +64,6 @@ const UsersPage = () => {
   const totalPages = Math.ceil(users.length / usersPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  const handleSort = (key) => {
-    setSortConfig(prev => ({
-      key,
-      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
-    }));
-  };
 
   return (
     <>
