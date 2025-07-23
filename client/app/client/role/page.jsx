@@ -1,9 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { allRoles, updateUserRole, deleteRoleById, deleteAllRole, } from '../../utils/allapi';
+import { updateUserRole, deleteRoleById, deleteAllRole } from '../../utils/allapi';
+import { fetchAllRole } from '../../utils/showAllData';
 import { FaEdit, FaRegTrashAlt } from 'react-icons/fa';
-import { useSortable } from '../../component/page';
+import { useSortable } from '../../component/common';
 
 const rolesList = [
   { value: 'admin', label: 'Admin' },
@@ -25,12 +26,11 @@ export default function RolePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState('');
-
   const { sortedData, sortConfig, handleSort } = useSortable(roles);
 
   const getUsers = async () => {
     try {
-      const data = await allRoles();
+      const data = await fetchAllRole();
       setRoles(data.users || []);
       toast.success('Users loaded successfully');
     } catch (err) {

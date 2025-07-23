@@ -42,23 +42,28 @@ const createTicket = async (req, res) => {
 // update new ticket 
 const updateTicket = async (req, res) => {
     try {
-        const { ticket_id, subject, status } = req.body;
+        const { old_ticket_id, ticket_id, subject, status, created_at } = req.body;
 
-        if (!ticket_id || !subject || !status) {
-            return res.status(400).json({ message: "ticket_id, subject, and status are required" });
+        if (!old_ticket_id || !ticket_id || !subject || !status || !created_at) {
+            return res.status(400).json({ message: "old_ticket_id, ticket_id, subject, status, and created_at are required" });
         }
 
+        const allowedStatuses = ['backlog', 'to_do', 'in_progress', 'on_hold', 'review', 'done'];
         if (!allowedStatuses.includes(status)) {
             return res.status(400).json({ message: "Invalid status value" });
         }
 
-        const sql = `UPDATE ticket SET subject = ?, status = ?, last_updated = NOW() WHERE ticket_id = ?`;
-        const values = [subject, status, ticket_id];
+        const sql = `
+            UPDATE ticket 
+            SET ticket_id = ?, subject = ?, status = ?, last_updated = NOW(), created_at = ?
+            WHERE ticket_id = ?
+        `;
+        const values = [ticket_id, subject, status, created_at, old_ticket_id];
 
         conn.query(sql, values, (err, result) => {
             if (err) {
                 return res.json({
-                    message: "Ticket update failed (possibly duplicate subject)",
+                    message: "Ticket update failed",
                     statusCode: 100,
                     error: err.message,
                 });
@@ -68,7 +73,7 @@ const updateTicket = async (req, res) => {
                 return res.status(404).json({ message: "Ticket not found" });
             }
 
-            return res.json({ message: "Ticket updated successfully....", statusCode: 200 });
+            return res.json({ message: "Ticket updated successfully", statusCode: 200 });
         });
     } catch (error) {
         return res.json({

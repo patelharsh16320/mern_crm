@@ -2,24 +2,8 @@ const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API
 
 //! For Users Start
 
-// Fetch All Api 
-export const fetchAllUsers = async () => {
-  try {
-    const res = await fetch(`${BASE_URL}/show-users`, {
-      method: 'GET',
-      cache: 'no-store',
-    });
-    if (!res.ok) throw new Error('Failed to fetch users');
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching users: ', error.message);
-    throw error
-  }
-}
-
 // Create New Users 
-export const createUser = async (formData) => {
+const createUser = async (formData) => {
   try {
     const res = await fetch(`${BASE_URL}/create-user`, {
       method: 'POST',
@@ -45,7 +29,7 @@ export const createUser = async (formData) => {
 };
 
 // Update Users 
-export const updateUser = async (formData) => {
+const updateUser = async (formData) => {
   try {
     const res = await fetch(`${BASE_URL}/update-user`, {
       method: 'POST',
@@ -71,7 +55,7 @@ export const updateUser = async (formData) => {
 };
 
 // Delete Single User
-export const deleteUserById = async (userId) => {
+const deleteUserById = async (userId) => {
   const res = await fetch(`${BASE_URL}/delete-user/${userId}`, {
     method: 'DELETE',
   });
@@ -84,7 +68,7 @@ export const deleteUserById = async (userId) => {
 };
 
 // Delete All User
-export const deleteAllUsers = async () => {
+const deleteAllUsers = async () => {
   const res = await fetch(`${BASE_URL}/delete-alluser`, {
     method: 'DELETE',
   });
@@ -97,24 +81,8 @@ export const deleteAllUsers = async () => {
 //! For Users End
 
 //! For Ticket Start
-// Fetch All Api 
-export const fetchAllTicket = async () => {
-  try {
-    const res = await fetch(`${BASE_URL}/show-ticket`, {
-      method: 'GET',
-      cache: 'no-store',
-    });
-    if (!res.ok) throw new Error('Failed to fetch ticket');
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching ticket: ', error.message);
-    throw error
-  }
-}
-
 // Create New Ticket 
-export const createNewTicket = async (ticketData) => {
+const createNewTicket = async (ticketData) => {
   try {
     const response = await fetch(`${BASE_URL}/create-ticket`, {
       method: "POST",
@@ -133,7 +101,7 @@ export const createNewTicket = async (ticketData) => {
 };
 
 // Update Ticket
-export const updateTicketById = async (ticketData) => {
+const updateTicketById = async (ticketData) => {
   const res = await fetch(`${BASE_URL}/update-ticket`, {
     method: "POST",
     headers: {
@@ -150,7 +118,7 @@ export const updateTicketById = async (ticketData) => {
 };
 
 // Delete Single Ticket
-export const deleteTicketById = async (ticketId) => {
+const deleteTicketById = async (ticketId) => {
   const res = await fetch(`${BASE_URL}/delete-ticket/${ticketId}`, {
     method: 'DELETE',
   });
@@ -163,7 +131,7 @@ export const deleteTicketById = async (ticketId) => {
 };
 
 // Delete All Ticket
-export const deleteAllTicket = async () => {
+const deleteAllTicket = async () => {
   const res = await fetch(`${BASE_URL}/delete-allticket`, {
     method: 'DELETE',
   });
@@ -173,13 +141,12 @@ export const deleteAllTicket = async () => {
   return data;
 };
 
-
 //! For Ticket End
 
 //! For User Login/Logout Start
 
 // Login User
-export const LoginUser = async (loginData) => {
+const LoginUser = async (loginData) => {
   const res = await fetch(`${BASE_URL}/login`, {
     method: 'POST',
     headers: {
@@ -187,29 +154,15 @@ export const LoginUser = async (loginData) => {
     },
     body: JSON.stringify(loginData),
   });
-
   const data = await res.json();
-
   return data;
 };
 //! For User Login/Logout End
 
 //! For Role Start
-// Role Define
-export const allRoles = async (loginData) => {
-  const res = await fetch(`${BASE_URL}/show-role`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(loginData),
-  });
-  const data = await res.json();
-  return data;
-};
 
 // Update Role
-export const updateUserRole = async (payload) => {
+const updateUserRole = async (payload) => {
   const res = await fetch(`${BASE_URL}/update-role`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -219,7 +172,7 @@ export const updateUserRole = async (payload) => {
 };
 
 // Delete Single role
-export const deleteRoleById = async (roleId) => {
+const deleteRoleById = async (roleId) => {
   const res = await fetch(`${BASE_URL}/delete-role/${roleId}`, {
     method: 'DELETE',
   });
@@ -232,7 +185,7 @@ export const deleteRoleById = async (roleId) => {
 };
 
 // Delete All Ticket
-export const deleteAllRole = async () => {
+const deleteAllRole = async () => {
   const res = await fetch(`${BASE_URL}/delete-allrole`, {
     method: 'DELETE',
   });
@@ -242,5 +195,15 @@ export const deleteAllRole = async () => {
   return data;
 };
 
-
 //! For Role End
+
+export {
+  //? Users Export
+   createUser, updateUser, deleteUserById, deleteAllUsers,
+
+  //? Ticket Export
+  createNewTicket, updateTicketById, deleteTicketById, deleteAllTicket, LoginUser,
+  
+  //? Role Export
+   updateUserRole, deleteRoleById, deleteAllRole
+};

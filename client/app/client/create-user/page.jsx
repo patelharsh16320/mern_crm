@@ -9,12 +9,7 @@ const Page = () => {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    user_id: '',
-    username: '',
-    email: '',
-    phone: '',
-    address: '',
-    created_at: ''
+    user_id: '', username: '', email: '', phone: '', address: '', created_at: ''
   });
 
   const [isUpdate, setIsUpdate] = useState(false);
@@ -50,16 +45,7 @@ const Page = () => {
         toast.success('User created successfully!');
       }
 
-      setFormData({
-        user_id: '',
-        username: '',
-        email: '',
-        phone: '',
-        password: '',
-        c_password: '',
-        address: '',
-        created_at: ''
-      });
+      setFormData({user_id: '', username: '', email: '', phone: '', password: '', c_password: '', address: '', created_at: ''});
 
       setTimeout(() => {
         router.push('/client');
@@ -93,11 +79,28 @@ const Page = () => {
     <>
       <form
         onSubmit={handleSubmit}
-        className="max-w-xl mx-auto p-8 mt-10 bg-white rounded-lg shadow-lg space-y-6"
+        className="max-w-xl mx-auto p-8 mt-10 bg-white rounded-2xl shadow-xl space-y-6"
       >
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              setFormData({ user_id: '', username: '', email: '', phone: '', password: '', c_password: '', address: '', created_at: '' });
+              setIsUpdate(false);
+              router.push('/client');
+            }}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+          >
+            ← Back
+          </button>
+        </div>
+
         {tabledata.map((props, index) => (
           <div key={index} className="flex flex-col">
-            <label className="mb-1 text-sm font-medium text-gray-700">
+            <label
+              htmlFor={props.name}
+              className="mb-1 text-sm font-medium text-gray-700"
+            >
               {props.label}
             </label>
             <input
@@ -111,9 +114,12 @@ const Page = () => {
             />
           </div>
         ))}
-        
+
         <div className="flex flex-col">
-          <label htmlFor="address" className="mb-1 text-sm font-medium text-gray-700">
+          <label
+            htmlFor="address"
+            className="mb-1 text-sm font-medium text-gray-700"
+          >
             Address
           </label>
           <textarea
@@ -122,10 +128,11 @@ const Page = () => {
             rows={3}
             value={formData.address}
             onChange={handleChange}
+            placeholder="Enter address"
             className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        
+
         {!isUpdate && (
           <input
             type="hidden"
@@ -134,21 +141,19 @@ const Page = () => {
           />
         )}
 
-        <div className="flex justify-between pt-4">
+        <div className="flex justify-between items-center pt-6">
           <button
             type="button"
             onClick={() => {
               setFormData({
-                user_id: '', username: '', email: '', phone: '',password:'', c_password: '', address: '', created_at: ''
+                user_id: '', username: '', email: '', phone: '', password: '', c_password: '', address: '', created_at: ''
               });
               setIsUpdate(false);
-              router.push('/client');
             }}
-            className="px-5 py-2 border border-gray-300 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 transition"
+            className="px-5 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
           >
-            Cancel
+            Reset
           </button>
-
           <button
             type="submit"
             className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
@@ -161,6 +166,7 @@ const Page = () => {
       <ToastContainer />
     </>
   );
+
 };
 
 export default Page;

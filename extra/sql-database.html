@@ -13,7 +13,7 @@ CREATE TABLE users (
 CREATE TABLE ticket (
     ticket_id INT AUTO_INCREMENT PRIMARY KEY,
     subject VARCHAR(200) NOT NULL,
-    status ENUM('backlog', 'to_do', 'in_progress', 'On_hold', 'review', 'done') NOT NULL,
+    status ENUM('backlog', 'to_do', 'in_progress', 'on_hold', 'review', 'done') NOT NULL,
     last_updated TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

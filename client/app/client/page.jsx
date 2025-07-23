@@ -1,11 +1,12 @@
 'use client'
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react"
-import { fetchAllUsers, deleteUserById, deleteAllUsers } from '../utils/allapi';
+import { deleteUserById, deleteAllUsers } from '../utils/allapi';
+import { fetchAllUsers } from '../utils/showAllData';
 import { toast } from 'react-toastify';
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
-import { useSortable } from '../component/page';
+import { useSortable } from '../component/common';
 
 const UsersPage = () => {
   const router = useRouter();

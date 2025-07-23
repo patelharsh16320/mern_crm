@@ -14,7 +14,8 @@ import Link from 'next/link'
 const navigation = [
   { name: 'Dashboard', href: '/', current: true },
   { name: 'Client', href: '/client', current: false },
-  { name: 'Role', href: '/client/role', current: false },
+  { name: 'Client Role', href: '/client/role', current: false },
+  { name: 'Products', href: '/product', current: false },
   { name: 'Ticket', href: '/ticket', current: false },
   { name: 'Login', href: '/login', current: false },
 ]

@@ -13,6 +13,7 @@
     "@heroicons/react": "^2.2.0",
     "@react-icons/all-files": "^4.1.0",
     "dotenv": "^17.2.0",
+    "framer-motion": "^12.23.6",
     "next": "15.3.5",
     "next-popover": "^0.0.41",
     "react": "^19.0.0",

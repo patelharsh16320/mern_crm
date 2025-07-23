@@ -20,27 +20,26 @@ export default function LoginPage() {
     setFormData({ email: '', password: '' });
   };
 
-const handleLogin = async (e) => {
-  e.preventDefault();
-  try {
-    const data = await LoginUser(formData);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const data = await LoginUser(formData);
+      if (data.statusCode === 200) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        toast.success(data.message || 'Login successful');
+        router.push('/');
+      } else if (data.statusCode === 401 || data.statusCode === 404) {
+        toast.error(data.message || 'Invalid email or password');
+      } else if (data.statusCode === 400) {
+        toast.warn(data.message || 'Missing credentials');
+      } else {
+        toast.error(data.message || 'Unexpected error');
+      }
 
-    if (data.statusCode === 200) {
-      localStorage.setItem('user', JSON.stringify(data.user));
-      toast.success(data.message || 'Login successful');
-      router.push('/');
-    } else if (data.statusCode === 401 || data.statusCode === 404) {
-      toast.error(data.message || 'Invalid email or password');
-    } else if (data.statusCode === 400) {
-      toast.warn(data.message || 'Missing credentials');
-    } else {
-      toast.error(data.message || 'Unexpected error');
+    } catch (err) {
+      toast.error('Server error. Please try again.');
     }
-
-  } catch (err) {
-    toast.error('Server error. Please try again.');
-  }
-};
+  };
 
 
   return (
