@@ -195,15 +195,81 @@ const deleteAllRole = async () => {
   return data;
 };
 
+//! For Product Start
+// Create New Ticket 
+const createNewProduct = async (productData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/create-product`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(productData),
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.error("API Error:", err);
+    throw err;
+  }
+};
+
+// Update Product
+const updateProductById = async (productData) => {
+  const res = await fetch(`${BASE_URL}/update-product`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(productData)
+  });
+
+  const data = await res.json();
+  if (!res.ok || data.statusCode !== 200) {
+    throw new Error(data.message || "Failed to update Product");
+  }
+  return data;
+};
+
+// Delete Single Product
+const deleteProductById = async (productData) => {
+  const res = await fetch(`${BASE_URL}/delete-product/${productData}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to delete Product");
+  }
+
+  return await res.json();
+};
+
+// Delete All Product
+const deleteAllProduct = async () => {
+  const res = await fetch(`${BASE_URL}/delete-allproduct`, {
+    method: 'DELETE',
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to delete all ticket');
+  return data;
+};
+
+// //! For Product End
+
 //! For Role End
 
 export {
   //? Users Export
-   createUser, updateUser, deleteUserById, deleteAllUsers,
+  createUser, updateUser, deleteUserById, deleteAllUsers,
 
   //? Ticket Export
   createNewTicket, updateTicketById, deleteTicketById, deleteAllTicket, LoginUser,
-  
+
   //? Role Export
-   updateUserRole, deleteRoleById, deleteAllRole
+  updateUserRole, deleteRoleById, deleteAllRole,
+  
+  //? Product Export,
+  createNewProduct, updateProductById, deleteProductById, deleteAllProduct
 };
