@@ -1,12 +1,12 @@
 'use client'
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react"
-import { deleteUserById, deleteAllUsers } from '../utils/allapi';
-import { fetchAllUsers } from '../utils/showAllData';
+import { deleteUserById, deleteAllUsers } from '../../utils/allapi';
+import { fetchAllUsers } from '../../utils/showAllData';
 import { toast } from 'react-toastify';
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
-import { useSortable } from '../component/common';
+import { useSortable } from '../../component/common';
 
 const UsersPage = () => {
   const router = useRouter();
@@ -33,13 +33,29 @@ const UsersPage = () => {
     }
   }, []);
 
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+
+    try {
+      await deleteUserById(id);
+      toast.success("User deleted successfully");
+      setUsers(users.filter(user => user.user_id !== id));
+      router.push('/client');
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete user");
+    }
+  };
+
   const columns = [
     { label: 'Index' },
     { key: 'name', label: 'Name' },
     { key: 'email', label: 'Email' },
     { key: 'number', label: 'Phone' },
     { key: 'created_at', label: 'Date of Join' },
-    { key: 'address', label: 'Address' }
+    { key: 'address', label: 'Address' },
+    { label: 'Edit' },
+    { label: 'Delete' }
   ]
 
   // Pagination Logic
@@ -58,6 +74,30 @@ const UsersPage = () => {
             <h1 className="text-2xl font-bold text-gray-800">All Clients</h1>
             <div className="flex gap-2">
               <p className='px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition'>Total Product: {users.length}</p>
+              <Link
+                href="/client/create-user"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              >
+                + New Client
+              </Link>
+              <button
+                onClick={async () => {
+                  const confirmDelete = confirm("Are you sure you want to delete all users?");
+                  if (!confirmDelete) return;
+
+                  try {
+                    const res = await deleteAllUsers();
+                    toast.success(res.message);
+                    setUsers([]);
+                  } catch (err) {
+                    toast.error(err.message || "Failed to delete all users");
+                  }
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+              >
+                Delete All
+              </button>
+
             </div>
           </div>
 
@@ -101,7 +141,28 @@ const UsersPage = () => {
                             hour12: true,
                           }).replace(',', ' at')}
                         </td>
-                        <td className="px-4 py-2 border">{user.address}</td>                       
+                        <td className="px-4 py-2 border">{user.address}</td>
+                        <td className="px-4 py-2 border">
+                          <button
+                            onClick={() => {
+                              localStorage.setItem('editUser', JSON.stringify(user));
+                              router.push('/client/create-user');
+                            }}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            <FaEdit />
+                          </button>
+                        </td>
+
+                        <td className="px-4 py-2 border">
+                          <button
+                            onClick={() => handleDelete(user.user_id)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <FaRegTrashAlt />
+                          </button>
+                        </td>
+
                       </tr>
                     ))}
                   </tbody>

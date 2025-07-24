@@ -28,12 +28,6 @@ const Page = () => {
         <div className="p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
             <div className='flex justify-between items-center mb-8'>
                 <h1 className="text-3xl font-bold text-gray-700">🛍️ All Products</h1>
-                <Link
-                    href="/product/create"
-                    className="px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-300 shadow"
-                >
-                    + New Product
-                </Link>
             </div>
 
             {Array.isArray(products) && products.length > 0 ? (

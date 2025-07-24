@@ -42,7 +42,7 @@ const page = () => {
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-800">All Details</h1>
           </div>
-          <div clasksName="overflow-auto">
+          <div className="overflow-auto">
             <table className="w-full table-auto border border-gray-300 text-center rounded-lg">
               <thead className="bg-blue-600 text-white uppercase text-sm">
                 <tr>

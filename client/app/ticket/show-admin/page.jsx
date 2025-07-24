@@ -6,13 +6,13 @@ import {
   updateTicketById,
   deleteTicketById,
   deleteAllTicket,
-} from '../utils/allapi';
-import { fetchAllTicket } from '../utils/showAllData';
+} from '../../utils/allapi';
+import { fetchAllTicket } from '../../utils/showAllData';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
-import { useSortable } from '../component/common';
+import { useSortable } from '../../component/common';
 
-export default function TicketPage() {
+export default function ShowAdmin() {
   const [tickets, setTickets] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -25,7 +25,9 @@ export default function TicketPage() {
   });
   const { sortedData: filteredTickets, sortConfig, handleSort } = useSortable(tickets);
 
-  useEffect(() => { getTickets(); }, []);
+  useEffect(() => {
+    getTickets();
+  }, []);
 
   const columns = [
     { label: 'Index' },
@@ -60,6 +62,12 @@ export default function TicketPage() {
     }
   };
 
+  const openCreateModal = () => {
+    setFormData({ ticket_id: '', subject: '', status: '' });
+    setIsEditMode(false);
+    setShowModal(true);
+  };
+
   const handleEdit = (ticket) => {
     setFormData({
       ticket_id: ticket.ticket_id,
@@ -81,22 +89,16 @@ export default function TicketPage() {
     }
   };
 
-  // const openCreateModal = () => {
-  //   setFormData({ ticket_id: '', subject: '', status: '' });
-  //   setIsEditMode(false);
-  //   setShowModal(true);
-  // };
-
-  // const handleDeleteAll = async () => {
-  //   if (!confirm('This will delete ALL tickets. Continue?')) return;
-  //   try {
-  //     const res = await deleteAllTicket();
-  //     toast.success(res.message || 'All tickets deleted');
-  //     getTickets();
-  //   } catch (err) {
-  //     toast.error(err.message || 'Failed to delete all');
-  //   }
-  // };
+  const handleDeleteAll = async () => {
+    if (!confirm('This will delete ALL tickets. Continue?')) return;
+    try {
+      const res = await deleteAllTicket();
+      toast.success(res.message || 'All tickets deleted');
+      getTickets();
+    } catch (err) {
+      toast.error(err.message || 'Failed to delete all');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -108,7 +110,7 @@ export default function TicketPage() {
         const originalTicket = tickets.find(t => t.ticket_id === formData.ticket_id);
 
         const updateData = {
-          old_ticket_id: formData.ticket_id,
+          old_ticket_id: formData.ticket_id, 
           ticket_id: formData.ticket_id,
           subject: formData.subject,
           status: formData.status,
@@ -144,6 +146,18 @@ export default function TicketPage() {
         <h1 className="text-2xl font-bold">All Tickets</h1>
         <div className="flex gap-2">
           <p className='px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition'>Total Product: {tickets.length}</p>
+          <button
+            onClick={openCreateModal}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            + New Ticket
+          </button>
+          <button
+            onClick={handleDeleteAll}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+          >
+            Delete All
+          </button>
         </div>
       </div>
       <table className="min-w-full bg-white border">
@@ -171,10 +185,24 @@ export default function TicketPage() {
               <td className="py-2 px-4 border-b">{statusLabels[ticket.status] || ticket.status}</td>
 
               <td className="py-2 px-4 border-b">
-                {new Date(ticket.created_at).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', ' at')}
+                {new Date(ticket.created_at).toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: true,
+                }).replace(',', ' at')}
               </td>
               <td className="py-2 px-4 border-b">
-                {new Date(ticket.created_at).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', ' at')}
+                {new Date(ticket.created_at).toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: true,
+                }).replace(',', ' at')}
               </td>
               <td className="py-2 px-4 border-b space-x-3">
                 <button
