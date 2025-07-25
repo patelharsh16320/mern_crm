@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LoginUser } from '../utils/allapi';
 import { toast } from 'react-toastify';
+import { resolve } from 'styled-jsx/css';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function LoginPage() {
   };
 
   const handleLogin = async (e) => {
+
     e.preventDefault();
     try {
       const data = await LoginUser(formData);
@@ -40,6 +42,7 @@ export default function LoginPage() {
       toast.error('Server error. Please try again.');
     }
   };
+
 
 
   return (

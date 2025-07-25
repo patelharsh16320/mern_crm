@@ -1,0 +1,4 @@
+2025-07-25 10:09:42 [INFO]: Deleted old log file: 18072025-api.log
+2025-07-25 10:10:12 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
+2025-07-25 10:10:12 [INFO]: [User: Guest | ID: NA] GET /show-ticket - ::1
+2025-07-25 10:15:02 [INFO]: [User: Guest | ID: NA] GET /show-users - ::1
