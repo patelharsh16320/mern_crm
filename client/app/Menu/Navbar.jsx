@@ -95,7 +95,7 @@ export default function Navbar({ onLogoClick }) {
                     <MenuItem>
                       {({ active }) => (
                         <Link
-                          href="#"
+                          href="/my-account"
                           className={classNames(
                             active ? 'bg-gray-100' : '',
                             'block px-4 py-2 text-sm text-gray-700'

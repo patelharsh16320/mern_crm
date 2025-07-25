@@ -101,7 +101,7 @@ const UsersPage = () => {
                             hour12: true,
                           }).replace(',', ' at')}
                         </td>
-                        <td className="px-4 py-2 border">{user.address}</td>                       
+                        <td className="px-4 py-2 border">{user.address}</td>
                       </tr>
                     ))}
                   </tbody>
