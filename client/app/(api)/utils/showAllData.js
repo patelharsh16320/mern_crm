@@ -21,7 +21,8 @@ const fetchAllRole = () => getData('/show-role');
 const fetchAllProduct = () => getData('/show-product');
 const fetchAllProductCategory = () => getData('/show-product_category');
 const fetchAllProductCategoryMap = () => getData('/show-product_category_map');
+const fetchAllCart = () => getData('/show-cart');
 
 export {
-    fetchAllUsers, fetchAllTicket, fetchAllRole, fetchAllProduct, fetchAllProductCategory, fetchAllProductCategoryMap
+    fetchAllUsers, fetchAllTicket, fetchAllRole, fetchAllProduct, fetchAllProductCategory, fetchAllProductCategoryMap, fetchAllCart
 };

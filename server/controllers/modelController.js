@@ -10,7 +10,8 @@ const getAllRecords = async (req, res) => {
             'role',
             'product',
             'product_category',
-            'product_category_map'
+            'product_category_map',
+            'cart'
         ];
 
         if (!validTables.includes(tableName)) {

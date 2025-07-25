@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { fetchAllProduct } from './../utils/showAllData';
+import { fetchAllProduct } from '../(api)/utils/showAllData';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -22,6 +22,31 @@ const Page = () => {
     useEffect(() => {
         getProducts();
     }, []);
+
+    const addToCart = (product) => {
+        try {
+            // Get existing cart or initialize
+            const existingCart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+            // Check if product is already in cart
+            const existingProductIndex = existingCart.findIndex((item) => item.id === product.id);
+
+            if (existingProductIndex !== -1) {
+                // Update quantity if exists
+                existingCart[existingProductIndex].quantity += 1;
+            } else {
+                // Add new product with quantity
+                existingCart.push({ ...product, quantity: 1 });
+            }
+
+            // Save to localStorage
+            localStorage.setItem('cart', JSON.stringify(existingCart));
+            toast.success(`${product.name} added to cart`);
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            toast.error('Failed to add item to cart');
+        }
+    };
 
 
     return (
@@ -48,7 +73,6 @@ const Page = () => {
                             <div className="p-4 space-y-2">
                                 <h2 className="text-lg font-semibold text-gray-800">{product.name}</h2>
 
-                                {/* Pricing Logic */}
                                 {product.sell_price && parseFloat(product.sell_price) > 0 ? (
                                     <div className="flex items-center space-x-2">
                                         <span className="text-green-600 font-bold text-md">
@@ -64,14 +88,18 @@ const Page = () => {
                                     </span>
                                 )}
 
-                                {/* Actions */}
                                 <div className="flex gap-2 mt-3">
-                                    <button className="flex-1 px-2 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200 transition duration-200 shadow-sm hover:shadow-md"> 🛒 Add to Cart </button>
+                                    <button
+                                        onClick={() => addToCart(product)}
+                                        className="flex-1 px-2 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200 transition duration-200 shadow-sm hover:shadow-md"
+                                    >
+                                        🛒 Add to Cart
+                                    </button>
 
-                                    <Link href="/checkout" className="flex-1 px-2 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-full hover:bg-green-200 transition duration-200 shadow-sm hover:shadow-md text-center" >💳 Buy Now </Link>
+
+                                    <Link href="/product/checkout" className="flex-1 px-2 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-full hover:bg-green-200 transition duration-200 shadow-sm hover:shadow-md text-center" >💳 Buy Now </Link>
                                 </div>
 
-                                {/* Rating & Stock */}
                                 <div className="flex justify-between items-center text-sm text-gray-500 mt-2">
                                     <p>Ratings ⭐ {product.rating}</p>
                                     <p>Stocks: {product.stock}</p>

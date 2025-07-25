@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LoginUser } from '../utils/allapi';
+import { LoginUser } from '../(api)/utils/allapi';
 import { toast } from 'react-toastify';
 import { resolve } from 'styled-jsx/css';
 

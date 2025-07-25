@@ -9,7 +9,6 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
 CREATE TABLE ticket (
     ticket_id INT AUTO_INCREMENT PRIMARY KEY,
     subject VARCHAR(200) NOT NULL,
@@ -17,3 +16,22 @@ CREATE TABLE ticket (
     last_updated TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE cart (
+  cart_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  products_qty JSON DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+INSERT INTO cart (user_id, products_qty)
+VALUES (
+  1,
+  JSON_ARRAY(
+    JSON_OBJECT('product_id', 1, 'qty', 2),
+    JSON_OBJECT('product_id', 2, 'qty', 5)
+  )
+);
+

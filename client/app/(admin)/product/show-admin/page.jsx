@@ -1,11 +1,11 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { fetchAllProduct } from '../../utils/showAllData';
+import { fetchAllProduct } from '../../../(api)/utils/showAllData';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
 import { useSortable } from '@/app/component/common';
-import { deleteProductById, deleteAllProduct } from '../../utils/allapi';
+import { deleteProductById, deleteAllProduct } from '../../../(api)/utils/allapi';
 
 const AdminShowProduct = () => {
     const [products, setProducts] = useState([]);

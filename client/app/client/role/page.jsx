@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { updateUserRole, deleteRoleById, deleteAllRole } from '../../utils/allapi';
-import { fetchAllRole } from '../../utils/showAllData';
+import { updateUserRole, deleteRoleById, deleteAllRole } from '../../(api)/utils/allapi';
+import { fetchAllRole } from '../../(api)/utils/showAllData';
 import { FaEdit, FaRegTrashAlt } from 'react-icons/fa';
 import { useSortable } from '../../component/common';
 

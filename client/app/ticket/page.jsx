@@ -6,8 +6,8 @@ import {
   updateTicketById,
   deleteTicketById,
   deleteAllTicket,
-} from '../utils/allapi';
-import { fetchAllTicket } from '../utils/showAllData';
+} from '../(api)/utils/allapi';
+import { fetchAllTicket } from '../(api)/utils/showAllData';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
 import { useSortable } from '../component/common';
@@ -33,8 +33,8 @@ export default function TicketPage() {
     { key: 'status', label: 'Status' },
     { key: 'created_at', label: 'Created At' },
     { key: 'last_updated', label: 'Last Updated' },
-    { label: 'Edit' },
-    { label: 'Delete' }
+    { label: 'Edit' }
+    // { label: 'Delete' }
   ]
 
   const statusLabels = {
@@ -44,6 +44,14 @@ export default function TicketPage() {
     on_hold: 'On Hold',
     review: 'Review',
     done: 'Done',
+  };
+  const statusColors = {
+    backlog: 'bg-gray-300 text-gray-800',
+    to_do: 'bg-yellow-300 text-yellow-900',
+    in_progress: 'bg-blue-300 text-blue-900',
+    on_hold: 'bg-red-300 text-red-900',
+    review: 'bg-yellow-200 text-yellow-800',
+    done: 'bg-green-300 text-green-900',
   };
 
   const paginatedTickets = filteredTickets.slice(
@@ -70,31 +78,14 @@ export default function TicketPage() {
     setShowModal(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this ticket?')) return;
-    try {
-      const res = await deleteTicketById(id);
-      toast.success(res.message || 'Ticket deleted');
-      getTickets();
-    } catch (err) {
-      toast.error(err.message || 'Failed to delete');
-    }
-  };
-
-  // const openCreateModal = () => {
-  //   setFormData({ ticket_id: '', subject: '', status: '' });
-  //   setIsEditMode(false);
-  //   setShowModal(true);
-  // };
-
-  // const handleDeleteAll = async () => {
-  //   if (!confirm('This will delete ALL tickets. Continue?')) return;
+  // const handleDelete = async (id) => {
+  //   if (!confirm('Are you sure you want to delete this ticket?')) return;
   //   try {
-  //     const res = await deleteAllTicket();
-  //     toast.success(res.message || 'All tickets deleted');
+  //     const res = await deleteTicketById(id);
+  //     toast.success(res.message || 'Ticket deleted');
   //     getTickets();
   //   } catch (err) {
-  //     toast.error(err.message || 'Failed to delete all');
+  //     toast.error(err.message || 'Failed to delete');
   //   }
   // };
 
@@ -168,7 +159,13 @@ export default function TicketPage() {
             <tr key={ticket.ticket_id}>
               <td className="py-2 px-4 border-b"> {(currentPage - 1) * itemsPerPage + index + 1} </td>
               <td className="py-2 px-4 border-b">{ticket.subject}</td>
-              <td className="py-2 px-4 border-b">{statusLabels[ticket.status] || ticket.status}</td>
+              {/* <td className="py-2 px-4 border-b">{statusLabels[ticket.status] || ticket.status}</td> */}
+              <td className="py-2 px-4 border-b">
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[ticket.status] || 'bg-gray-200 text-gray-800'}`}>
+                  {statusLabels[ticket.status] || ticket.status}
+                </span>
+              </td>
+
 
               <td className="py-2 px-4 border-b">
                 {new Date(ticket.created_at).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', ' at')}
@@ -184,14 +181,14 @@ export default function TicketPage() {
                   <FaEdit />
                 </button>
               </td>
-              <td className="py-2 px-4 border-b space-x-3">
+              {/* <td className="py-2 px-4 border-b space-x-3">
                 <button
                   onClick={() => handleDelete(ticket.ticket_id)}
                   className="text-red-600 hover:underline"
                 >
                   <FaRegTrashAlt />
                 </button>
-              </td>
+              </td> */}
             </tr>
           ))}
         </tbody>

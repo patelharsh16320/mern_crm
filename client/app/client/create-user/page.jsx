@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
-import { createUser, updateUser } from '../../utils/allapi';
+import { createUser, updateUser } from '../../(api)/utils/allapi';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Page = () => {

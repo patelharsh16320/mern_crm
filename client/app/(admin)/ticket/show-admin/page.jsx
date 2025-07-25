@@ -6,11 +6,11 @@ import {
   updateTicketById,
   deleteTicketById,
   deleteAllTicket,
-} from '../../utils/allapi';
-import { fetchAllTicket } from '../../utils/showAllData';
+} from '../../../(api)/utils/allapi';
+import { fetchAllTicket } from '../../../(api)/utils/showAllData';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
-import { useSortable } from '../../component/common';
+import { useSortable } from '../../../component/common';
 
 export default function ShowAdmin() {
   const [tickets, setTickets] = useState([]);

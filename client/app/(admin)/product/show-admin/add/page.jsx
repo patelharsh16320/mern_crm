@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { updateProductById, createNewProduct } from '@/app/utils/allapi';
+import { updateProductById, createNewProduct } from '../../../../(api)/utils/allapi';
 import { toast } from 'react-toastify';
 
 const ProductFormPage = () => {

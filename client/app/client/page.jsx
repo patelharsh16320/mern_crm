@@ -1,8 +1,8 @@
 'use client'
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react"
-import { deleteUserById, deleteAllUsers } from '../utils/allapi';
-import { fetchAllUsers } from '../utils/showAllData';
+import { deleteUserById, deleteAllUsers } from '../(api)/utils/allapi';
+import { fetchAllUsers } from '../(api)/utils/showAllData';
 import { toast } from 'react-toastify';
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
 import { useRouter } from 'next/navigation';

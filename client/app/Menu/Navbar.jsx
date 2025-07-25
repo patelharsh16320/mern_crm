@@ -15,8 +15,9 @@ import Link from 'next/link';
 const navigation = [
   { name: 'Dashboard', href: '/' },
   { name: 'Client', href: '/client' },
-  // { name: 'Client Role', href: '/client/role' },
   { name: 'Products', href: '/product' },
+  { name: 'Cart', href: '/product/cart' },
+  { name: 'Checkout', href: '/product/checkout' },
   { name: 'Ticket', href: '/ticket' },
   { name: 'Login', href: '/login' },
 ];

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from "react"
-import {  fetchAllTicket } from './utils/showAllData';
-import { fetchAllUsers } from './utils/showAllData';
+import {  fetchAllTicket } from './(api)/utils/showAllData';
+import { fetchAllUsers } from './(api)/utils/showAllData';
 
 const page = () => {
   const [tabledata, setTabledata] = useState([]);
