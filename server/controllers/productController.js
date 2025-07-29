@@ -157,8 +157,6 @@ const deleteAllProduct = async (req, res) => {
 const createCategory = async (req, res) => {
     try {
         const { name, desc } = req.body;
-        console.log('name', name);
-        console.log('desc', desc);
         if (!name || !desc) {
             return res.status(400).json({
                 message: "Missing required category details",

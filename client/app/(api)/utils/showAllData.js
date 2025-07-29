@@ -36,22 +36,6 @@ const fetchUpdatedCart = async (userId) => {
   }
 };
 
-const updateCart = async (cartId, userId, updatedProducts) => {
-  const response = await fetch(`${BASE_URL}/update-cart/${cartId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      user_id: userId,
-      products_qty: updatedProducts,
-      created_at: new Date().toISOString().slice(0, 19).replace('T', ' ')
-    }),
-  });
-
-  return response.json();
-};
-
 export {
-  fetchAllUsers, fetchAllTicket, fetchAllRole, fetchAllProduct, fetchAllProductCategory, fetchAllProductCategoryMap, fetchAllCart, fetchUpdatedCart, updateCart
+  fetchAllUsers, fetchAllTicket, fetchAllRole, fetchAllProduct, fetchAllProductCategory, fetchAllProductCategoryMap, fetchAllCart, fetchUpdatedCart
 };

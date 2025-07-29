@@ -1,146 +1,126 @@
-'use client'
-import Link from "next/link";
-import { useState, useEffect, useRef } from "react"
-import { deleteUserById, deleteAllUsers } from '../(api)/utils/allapi';
+'use client';
+import { useEffect, useState, useRef } from 'react';
 import { fetchAllUsers } from '../(api)/utils/showAllData';
-import { toast } from 'react-toastify';
-import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
-import { useRouter } from 'next/navigation';
 import { useSortable } from '../component/common';
+import { toast } from 'react-toastify';
 
 const UsersPage = () => {
-  const router = useRouter();
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
   const hasFetched = useRef(false);
-  const { sortedData: sortedUsers, sortConfig, handleSort } = useSortable(users);
 
-  const getUsers = async () => {
-    try {
-      const data = await fetchAllUsers();
-      setUsers(data.users);
-      toast.success('Users loaded successfully');
-    } catch (err) {
-      toast.error('Failed to load users');
-    }
-  };
+  const { sortedData, sortConfig, handleSort } = useSortable(users);
 
   useEffect(() => {
     if (!hasFetched.current) {
-      getUsers(true);
+      fetchAllUsers()
+        .then(res => {
+          setUsers(res?.users || []);
+          toast.success('Users loaded');
+        })
+        .catch(() => toast.error('Failed to load users'));
       hasFetched.current = true;
     }
   }, []);
 
-  const columns = [
-    { label: 'Index' },
-    { key: 'name', label: 'Name' },
-    { key: 'email', label: 'Email' },
-    { key: 'number', label: 'Phone' },
-    { key: 'created_at', label: 'Date of Join' },
-    { key: 'address', label: 'Address' }
-  ]
-
-  // Pagination Logic
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const indexOfLast = currentPage * usersPerPage;
+  const indexOfFirst = indexOfLast - usersPerPage;
+  const currentUsers = sortedData.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(users.length / usersPerPage);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const columns = [
+    { label: '#', key: null },
+    { label: 'Name', key: 'name' },
+    { label: 'Email', key: 'email' },
+    { label: 'Phone', key: 'number' },
+    { label: 'Joined On', key: 'created_at' },
+    { label: 'Address', key: 'address' }
+  ];
 
   return (
-    <>
-      <div className="flex justify-center items-start min-h-screen bg-gray-100 px-4 py-10">
-        <div className="w-full max-w-6xl bg-white p-6 rounded-lg shadow-lg">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">All Clients</h1>
-            <div className="flex gap-2">
-              <p className='px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition'>Total Product: {users.length}</p>
-            </div>
-          </div>
-
-          {users.length === 0 ? (
-            <p>No users found</p>
-          ) : (
-            <>
-              <div className="overflow-auto">
-                <table className="w-full table-auto border border-gray-300 text-left rounded-lg">
-                  <thead className="bg-blue-600 text-white uppercase text-sm">
-                    <tr>
-                      {columns.map((col, idx) => (
-                        <th
-                          key={idx}
-                          className={`px-4 py-2 border ${col.key ? 'cursor-pointer' : ''}`}
-                          onClick={col.key ? () => handleSort(col.key) : undefined}
-                        >
-                          {col.label}
-                          {col.key === sortConfig.key && (
-                            <span> {sortConfig.direction === 'asc' ? '▲' : '▼'}</span>
-                          )}
-                        </th>
-                      ))}
-                    </tr>
-
-                  </thead>
-                  <tbody>
-                    {currentUsers.map((user, index) => (
-                      <tr key={index} className="hover:bg-gray-100 text-gray-700">
-                        <td className="px-4 py-2 border">{indexOfFirstUser + index + 1}</td>
-                        <td className="px-4 py-2 border">{user.name}</td>
-                        <td className="px-4 py-2 border">{user.email}</td>
-                        <td className="px-4 py-2 border">{user.number}</td>
-                        <td className="px-4 py-2 border">
-                          {new Date(user.created_at).toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true,
-                          }).replace(',', ' at')}
-                        </td>
-                        <td className="px-4 py-2 border">{user.address}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="flex justify-center mt-6 space-x-2">
-                <button
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                >
-                  Prev
-                </button>
-                {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => paginate(i + 1)}
-                    className={`px-3 py-1 rounded ${currentPage === i + 1
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 hover:bg-gray-300"
-                      }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
-            </>
-          )}
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 py-10 px-4 flex justify-center">
+      <div className="w-full max-w-6xl bg-white p-8 rounded-2xl shadow-md">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-blue-700">👤 All Clients</h1>
+          <p className="text-sm bg-blue-100 text-blue-700 px-4 py-2 rounded-md shadow">
+            Total: {users.length}
+          </p>
         </div>
+
+        {users.length === 0 ? (
+          <p className="text-center text-gray-500">No users found</p>
+        ) : (
+          <>
+            <div className="overflow-auto rounded-lg shadow border">
+              <table className="min-w-full text-sm text-left">
+                <thead className="bg-blue-600 text-white uppercase tracking-wider">
+                  <tr>
+                    {columns.map((col, idx) => (
+                      <th
+                        key={idx}
+                        className={`px-4 py-3 ${col.key ? 'cursor-pointer' : ''}`}
+                        onClick={col.key ? () => handleSort(col.key) : undefined}
+                      >
+                        {col.label}
+                        {col.key === sortConfig.key && (
+                          <span> {sortConfig.direction === 'asc' ? '▲' : '▼'}</span>
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="text-gray-700">
+                  {currentUsers.map((user, idx) => (
+                    <tr key={idx} className="border-t hover:bg-gray-50">
+                      <td className="px-4 py-2">{indexOfFirst + idx + 1}</td>
+                      <td className="px-4 py-2">{user.name}</td>
+                      <td className="px-4 py-2">{user.email}</td>
+                      <td className="px-4 py-2">{user.number}</td>
+                      <td className="px-4 py-2">
+                        {new Date(user.created_at).toLocaleDateString('en-IN', {
+                          year: 'numeric', month: 'short', day: 'numeric'
+                        })}
+                      </td>
+                      <td className="px-4 py-2">{user.address}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex justify-center mt-6 space-x-2">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+              >
+                Prev
+              </button>
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-1 rounded ${currentPage === i + 1
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

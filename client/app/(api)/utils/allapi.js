@@ -260,7 +260,7 @@ const deleteAllProduct = async () => {
 //! For Product End
 
 //! For Cart Start
-const createCart = async (user_id, products_qty) => {
+const createCart = async ({ user_id, products_qty }) => {
   try {
     const response = await fetch(`${BASE_URL}/create-cart`, {
       method: 'POST',
@@ -274,6 +274,12 @@ const createCart = async (user_id, products_qty) => {
     });
 
     const data = await response.json();
+
+    // Handle non-200 responses
+    if (!response.ok) {
+      console.warn('Create Cart Failed:', data.message || 'Unknown error');
+    }
+
     return data;
   } catch (error) {
     console.error('Create Cart API Error:', error);
@@ -285,46 +291,31 @@ const createCart = async (user_id, products_qty) => {
 };
 
 // Update Cart
-const updateCart = async (req, res) => {
+const updateCart = async ({ user_id, products_qty }) => {
   try {
-    const { cart_id, user_id, products_qty, created_at } = req.body;
-
-    if (!cart_id || !user_id || !Array.isArray(products_qty) || !created_at) {
-      return res.status(400).json({
-        message: "Missing cart_id, user_id, products_qty (must be array), or created_at",
-        statusCode: 400
-      });
-    }
-
-    const productsQtyJson = JSON.stringify(products_qty);
-
-    const sql = `UPDATE cart SET cart_id = ?, user_id = ?, products_qty = ?, created_at = ? WHERE 1`;
-    const values = [cart_id, user_id, productsQtyJson, created_at];
-
-    conn.query(sql, values, (err, result) => {
-      if (err) {
-        console.error("Cart update error:", err);
-        return res.status(409).json({
-          message: "Cart update failed",
-          statusCode: 409
-        });
-      }
-
-      return res.status(200).json({
-        message: "Cart updated successfully",
-        statusCode: 200,
-        affectedRows: result.affectedRows
-      });
+    const response = await fetch(`${BASE_URL}/update-cart/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id,
+        products_qty,
+        created_at: new Date().toISOString(), // or pass explicitly if needed
+      }),
     });
 
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error("Internal error:", error);
-    return res.status(500).json({
-      message: "Internal server error while updating cart",
-      statusCode: 500
-    });
+    console.error('Update Cart API Error:', error);
+    return {
+      message: 'Failed to update cart',
+      statusCode: 500,
+    };
   }
 };
+
 
 //! For Cart End
 

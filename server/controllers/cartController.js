@@ -116,21 +116,22 @@ const showDataOfCart = async (req, res) => {
 // };
 const createCart = async (req, res) => {
   try {
-    const { cart_id, user_id, products_qty, created_at } = req.body;
+    const { user_id, products_qty } = req.body;
 
     // Validation
-    if (!cart_id || !user_id || !Array.isArray(products_qty) || !created_at) {
+    if (!user_id || !Array.isArray(products_qty)) {
       return res.status(400).json({
-        message: "Missing cart_id, user_id, products_qty (must be array), or created_at",
+        message: "Missing user_id or products_qty (must be array)",
         statusCode: 400
       });
     }
 
-    // Convert to JSON string for MySQL
+    // Convert products_qty to JSON string for MySQL
     const productsQtyJson = JSON.stringify(products_qty);
 
-    const sql = `INSERT INTO cart (cart_id, user_id, products_qty, created_at) VALUES (?, ?, ?, ?)`;
-    const values = [cart_id, user_id, productsQtyJson, created_at];
+    // Use CURRENT_TIMESTAMP for created_at and let cart_id auto-increment
+    const sql = `INSERT INTO cart (user_id, products_qty, created_at) VALUES (?, ?, NOW())`;
+    const values = [user_id, productsQtyJson];
 
     conn.query(sql, values, (err, result) => {
       if (err) {
@@ -145,7 +146,7 @@ const createCart = async (req, res) => {
       return res.status(201).json({
         message: "Cart created successfully",
         statusCode: 201,
-        cart_id: cart_id
+        cart_id: result.insertId // This gives you the auto-incremented cart_id
       });
     });
 
@@ -161,23 +162,23 @@ const createCart = async (req, res) => {
 // Update Cart
 const updateCart = async (req, res) => {
   try {
-    const { user_id, products_qty, created_at } = req.body;
+    const { user_id, products_qty } = req.body;
 
     // Validation
-    if (!user_id || !Array.isArray(products_qty) || !created_at) {
+    if (!user_id || !Array.isArray(products_qty)) {
       return res.status(400).json({
-        message: "Missing user_id, products_qty (must be array), or created_at",
+        message: "Missing user_id or products_qty (must be an array)",
         statusCode: 400
       });
     }
 
     const productsQtyJson = JSON.stringify(products_qty);
 
-    // Step 1: Check if user_id exists in cart table
+    // Step 1: Check if a cart exists for the given user
     const checkSql = `SELECT * FROM cart WHERE user_id = ?`;
     conn.query(checkSql, [user_id], (err, result) => {
       if (err) {
-        console.error("Error checking user_id in cart:", err);
+        console.error("Database error during user_id check:", err);
         return res.status(500).json({
           message: "Database error while checking user_id",
           statusCode: 500
@@ -191,13 +192,13 @@ const updateCart = async (req, res) => {
         });
       }
 
-      // Step 2: Perform the update
+      // Step 2: Perform the update (update products_qty & updated_at)
       const updateSql = `
         UPDATE cart 
-        SET products_qty = ?, created_at = ?
+        SET products_qty = ?, created_at = NOW()
         WHERE user_id = ?
       `;
-      const values = [productsQtyJson, created_at, user_id];
+      const values = [productsQtyJson, user_id];
 
       conn.query(updateSql, values, (err, updateResult) => {
         if (err) {
@@ -207,6 +208,7 @@ const updateCart = async (req, res) => {
             statusCode: 409
           });
         }
+
         return res.status(200).json({
           message: "Cart updated successfully",
           statusCode: 200,

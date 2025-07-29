@@ -1,79 +1,61 @@
 'use client';
-import { useState, useEffect } from "react";
+import { useEffect, useState } from 'react';
+import { fetchAllUsers, fetchAllTicket } from './(api)/utils/showAllData';
+import { toast } from 'react-toastify';
 
 const Page = () => {
-  const [tabledata, setTabledata] = useState([]);
-  const [userInfo, setUserInfo] = useState({ name: '', email: '' });
+  const [stats, setStats] = useState({
+    users: 0,
+    tickets: 0,
+    inProgress: 0,
+  });
 
   useEffect(() => {
-    const loadDataFromLocalStorage = () => {
+    const loadStats = async () => {
       try {
-        // Load user info
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-          setUserInfo({ name: user.name, email: user.email });
-        }
+        const userRes = await fetchAllUsers();
+        const ticketRes = await fetchAllTicket();
+        const tickets = ticketRes?.users || [];
 
-        // Load data
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        const tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+        setStats({
+          users: userRes?.users?.length || 0,
+          tickets: tickets.length,
+          inProgress: tickets.filter(t => t.status === 'in_progress').length,
+        });
 
-        const totalClient = users.length;
-        const totalTicket = tickets.length;
-        const pendingCount = tickets.filter(t => t.status === 'in_progress').length;
-
-        setTabledata([
-          { name: 'Total Clients', count: totalClient },
-          { name: 'Total Tickets', count: totalTicket },
-          { name: 'In Progress Tickets', count: pendingCount }
-        ]);
+        toast.success('Data loaded successfully');
       } catch (err) {
-        console.error('Failed to read localStorage:', err);
+        toast.error('Failed to load data');
       }
     };
 
-    loadDataFromLocalStorage();
+    loadStats();
   }, []);
 
   return (
-    <div className="flex justify-center items-start min-h-screen bg-gray-100 px-4 py-10">
-      <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-lg">
-
-        {/* User Info */}
-        <div className="mb-4">
-          <p className="text-lg font-medium text-gray-700">Welcome, <span className="font-bold">{userInfo.name}</span></p>
-          <p className="text-sm text-gray-500">{userInfo.email}</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 py-12 px-4 flex justify-center">
+      <div className="w-full max-w-4xl bg-white rounded-3xl shadow-lg p-10">
+        <div className="mb-10 text-center">
+          <h1 className="text-4xl font-bold text-blue-600 mb-2">📊 Dashboard Overview</h1>
+          <p className="text-sm text-gray-500">Your system statistics at a glance</p>
         </div>
 
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">All Details</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <StatCard label="Total Clients" count={stats.users} icon="👥" />
+          <StatCard label="Total Tickets" count={stats.tickets} icon="🎫" />
+          <StatCard label="In Progress Tickets" count={stats.inProgress} icon="⏳" />
         </div>
-
-        {/* Table */}
-        <div className="overflow-auto">
-          <table className="w-full table-auto border border-gray-300 text-center rounded-lg">
-            <thead className="bg-blue-600 text-white uppercase text-sm">
-              <tr>
-                <th className="px-4 py-2 border border-gray-300">Index</th>
-                <th className="px-4 py-2 border border-gray-300">Name</th>
-                <th className="px-4 py-2 border border-gray-300">Count</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tabledata.map((item, index) => (
-                <tr key={index} className="hover:bg-gray-100 text-gray-700">
-                  <td className="px-4 py-2 border border-gray-300">{index + 1}</td>
-                  <td className="px-4 py-2 border border-gray-300">{item.name}</td>
-                  <td className="px-4 py-2 border border-gray-300">{item.count}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
       </div>
     </div>
   );
 };
+
+const StatCard = ({ label, count, icon }) => (
+  <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 shadow hover:shadow-md transition-all">
+    <div className="text-3xl mb-2">{icon}</div>
+    <p className="text-gray-600 text-sm">{label}</p>
+    <p className="text-2xl font-bold text-blue-700">{count}</p>
+  </div>
+);
 
 export default Page;

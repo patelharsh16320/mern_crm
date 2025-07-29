@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 25, 2025 at 12:54 PM
+-- Generation Time: Jul 29, 2025 at 12:06 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.1.12
 
@@ -39,22 +39,21 @@ CREATE TABLE `cart` (
 --
 
 INSERT INTO `cart` (`cart_id`, `user_id`, `products_qty`, `created_at`) VALUES
-(5, 190, '[{\"product_id\": 1, \"qty\": 2}, {\"product_id\": 2, \"qty\": 5}]', '2025-07-25 09:25:00'),
-(6, 190, '[{\"product_id\": 2, \"qty\": 1}, {\"product_id\": 5, \"qty\": 3}]', '2025-07-25 09:26:27'),
+(6, 190, '[{\"product_id\":1,\"qty\":5},{\"product_id\":2,\"qty\":2},{\"product_id\":2,\"qty\":5},{\"product_id\":1,\"qty\":2},{\"product_id\":2,\"qty\":2},{\"product_id\":2,\"qty\":5},{\"product_id\":1,\"qty\":2},{\"product_id\":2,\"qty\":2},{\"product_id\":2,\"qty\":4},{\"product_id\":1,\"qty\":1},{\"product_id\":2,\"qty\":1}]', '2025-07-29 07:00:22'),
 (7, 191, '[{\"product_id\": 7, \"qty\": 2}, {\"product_id\": 3, \"qty\": 1}]', '2025-07-25 09:26:27'),
 (8, 192, '[{\"product_id\": 10, \"qty\": 4}]', '2025-07-25 09:26:27'),
 (9, 193, '[{\"product_id\": 1, \"qty\": 2}, {\"product_id\": 4, \"qty\": 1}]', '2025-07-25 09:26:27'),
 (10, 194, '[{\"product_id\": 6, \"qty\": 1}, {\"product_id\": 11, \"qty\": 2}]', '2025-07-25 09:26:27'),
 (11, 195, '[{\"product_id\": 8, \"qty\": 3}, {\"product_id\": 9, \"qty\": 1}]', '2025-07-25 09:26:27'),
 (12, 196, '[{\"product_id\": 12, \"qty\": 2}]', '2025-07-25 09:26:27'),
-(13, 197, '[{\"product_id\": 14, \"qty\": 1}, {\"product_id\": 3, \"qty\": 2}]', '2025-07-25 09:26:27'),
 (14, 198, '[{\"product_id\": 15, \"qty\": 1}, {\"product_id\": 1, \"qty\": 4}]', '2025-07-25 09:26:27'),
 (15, 199, '[{\"product_id\": 13, \"qty\": 3}]', '2025-07-25 09:26:27'),
 (16, 200, '[{\"product_id\": 16, \"qty\": 1}, {\"product_id\": 6, \"qty\": 1}]', '2025-07-25 09:26:27'),
 (17, 201, '[{\"product_id\": 7, \"qty\": 2}, {\"product_id\": 2, \"qty\": 2}]', '2025-07-25 09:26:27'),
-(18, 202, '[{\"product_id\": 4, \"qty\": 3}]', '2025-07-25 09:26:27'),
+(18, 202, '[{\"product_id\":3,\"qty\":1},{\"product_id\":14,\"qty\":4}]', '2025-07-29 09:31:32'),
 (19, 203, '[{\"product_id\": 10, \"qty\": 2}, {\"product_id\": 8, \"qty\": 1}]', '2025-07-25 09:26:27'),
-(20, 204, '[{\"product_id\": 5, \"qty\": 2}, {\"product_id\": 9, \"qty\": 2}]', '2025-07-25 09:26:27');
+(20, 204, '[{\"product_id\":3,\"qty\":8},{\"product_id\":4,\"qty\":1}]', '2025-07-28 09:15:00'),
+(1011, 197, '[{\"product_id\":3,\"qty\":1}]', '2025-07-29 09:29:50');
 
 -- --------------------------------------------------------
 
@@ -222,12 +221,15 @@ CREATE TABLE `ticket` (
 --
 
 INSERT INTO `ticket` (`ticket_id`, `subject`, `status`, `last_updated`, `created_at`) VALUES
-(86, 'Login data Store in localsystem', 'backlog', '2025-07-25 09:37:46', '2025-07-25 09:37:46'),
-(87, 'UI check', 'backlog', '2025-07-25 09:39:01', '2025-07-25 09:39:01'),
+(86, 'Login data Store in localsystem', 'in_progress', '2025-07-25 10:59:39', '2025-07-25 04:07:46'),
+(87, 'UI check', 'done', '2025-07-25 10:59:32', '2025-07-25 04:09:01'),
 (88, 'Cart Data insert', 'backlog', '2025-07-25 09:41:11', '2025-07-25 09:41:11'),
-(89, 'Checkout dynamic Data', 'backlog', '2025-07-25 09:41:11', '2025-07-25 09:41:11'),
+(89, 'Checkout page dynamic Data', 'on_hold', '2025-07-25 10:59:50', '2025-07-25 04:11:11'),
 (90, 'Payment Menthod', 'backlog', '2025-07-25 09:42:51', '2025-07-25 09:42:51'),
-(91, 'Login + cart + store data', 'backlog', '2025-07-25 09:42:51', '2025-07-25 09:42:51');
+(91, 'Login + cart + store data', 'backlog', '2025-07-25 09:42:51', '2025-07-25 09:42:51'),
+(92, 'Cart Insert, update - Node API ', 'in_progress', '2025-07-25 10:55:37', '2025-07-25 05:25:07'),
+(93, 'Ticket Page - New Description Field add', 'backlog', '2025-07-25 11:00:38', '2025-07-25 11:00:38'),
+(94, 'Encrypt and Decrypt Password Node, Mysql', 'in_progress', '2025-07-25 12:56:27', '2025-07-25 12:56:27');
 
 -- --------------------------------------------------------
 
@@ -252,25 +254,24 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `name`, `email`, `password`, `c_password`, `number`, `address`, `created_at`) VALUES
 (190, 'Jane Smith', 'jane.smith2@example.com', 'jane.smith2@example.com	', 'jane.smith2@example.com	', 9876543211, '456 Park Ave, Mumbai', '2025-07-25 09:36:44'),
-(191, 'Robert Brown', 'robert.brown3@example.com', 'Pass@1234', 'Pass@1234', 9876543212, '789 Hill Rd, Bangalore', '2025-07-22 06:05:39'),
+(191, 'Robert Brown', 'robert.brown3@example.com', 'robert.brown3@example.com', 'robert.brown3@example.com', 9876543212, '789 Hill Rd, Bangalore', '2025-07-25 12:46:17'),
 (192, 'Emily Davis', 'emily.davis4@example.com', 'Pass@1234', 'Pass@1234', 9876543213, '22 Cross St, Pune', '2025-07-22 06:05:39'),
 (193, 'Michael Wilson', 'michael.wilson5@example.com', 'Pass@1234', 'Pass@1234', 9876543214, '100 Lakeview, Chennai', '2025-07-22 06:05:39'),
 (194, 'Linda Johnson', 'linda.johnson6@example.com', 'Pass@1234', 'Pass@1234', 9876543215, '82 MG Rd, Kolkata', '2025-07-22 06:05:39'),
 (195, 'David Miller', 'david.miller7@example.com', 'Pass@1234', 'Pass@1234', 9876543216, '5 Palm Grove, Hyderabad', '2025-07-22 06:05:39'),
 (196, 'Susan Anderson', 'susan.anderson8@example.com', 'Pass@1234', 'Pass@1234', 9876543217, '17 Beach Rd, Goa', '2025-07-22 06:05:39'),
-(197, 'James Moore', 'james.moore9@example.com', 'Pass@1234', 'Pass@1234', 9876543218, '11 Ridge Ave, Jaipur', '2025-07-22 06:05:39'),
+(197, 'James Moore', 'james.moore9@example.com', 'james.moore9@example.com	', 'james.moore9@example.com	', 9876543218, '11 Ridge Ave, Jaipur', '2025-07-28 09:30:37'),
 (198, 'Patricia Taylor', 'patricia.taylor10@example.com', 'Pass@1234', 'Pass@1234', 9876543219, '99 Lake Rd, Ahmedabad', '2025-07-22 06:05:39'),
 (199, 'Daniel Thomas', 'daniel.thomas11@example.com', 'Pass@1234', 'Pass@1234', 9876543220, '7 South St, Lucknow', '2025-07-22 06:05:39'),
 (200, 'Sarah Jackson', 'sarah.jackson12@example.com', 'Pass@1234', 'Pass@1234', 9876543221, '51 Rose Dr, Indore', '2025-07-22 06:05:39'),
 (201, 'Christopher White', 'chris.white13@example.com', 'Pass@1234', 'Pass@1234', 9876543222, '16 Elm Rd, Bhopal', '2025-07-22 06:05:39'),
-(202, 'Karen Harris', 'karen.harris14@example.com', 'Pass@1234', 'Pass@1234', 9876543223, '42 Club Rd, Patna', '2025-07-22 06:05:39'),
+(202, 'Karen Harris', 'karen.harris14@example.com', 'karen.harris14@example.com	', 'karen.harris14@example.com	', 9876543223, '42 Club Rd, Patna', '2025-07-29 09:30:41'),
 (203, 'Brian Martin', 'brian.martin15@example.com', 'Pass@1234', 'Pass@1234', 9876543224, '19 Station Rd, Ranchi', '2025-07-22 06:05:39'),
 (204, 'Nancy Thompson', 'nancy.thompson16@example.com', 'Pass@1234', 'Pass@1234', 9876543225, '44 University St, Nagpur', '2025-07-22 06:05:39'),
 (205, 'Kevin Garcia', 'kevin.garcia17@example.com', 'Pass@1234', 'Pass@1234', 9876543226, '2 King St, Surat', '2025-07-22 06:05:39'),
 (206, 'Laura Martinez', 'laura.martinez18@example.com', 'Pass@1234', 'Pass@1234', 9876543227, '78 Green Ave, Varanasi', '2025-07-22 06:05:39'),
 (207, 'Mark Robinson', 'mark.robinson19@example.com', 'Pass@1234', 'Pass@1234', 9876543228, '33 Market St, Noida', '2025-07-22 06:05:39'),
-(208, 'Jennifer Clark', 'jennifer.clark20@example.com', 'Pass@1234', 'Pass@1234', 9876543229, '9 Ring Rd, Chandigarh', '2025-07-22 06:05:39'),
-(209, 'John Doe', 'john.doe1@example.com', '123456', '123456', 123456789, '1204 Salem RD', '2025-07-23 06:49:03');
+(208, 'Jennifer Clark', 'jennifer.clark20@example.com', 'Pass@1234', 'Pass@1234', 9876543229, '9 Ring Rd, Chandigarh', '2025-07-22 06:05:39');
 
 --
 -- Indexes for dumped tables
@@ -330,7 +331,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1012;
 
 --
 -- AUTO_INCREMENT for table `product`
@@ -354,7 +355,7 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT for table `ticket`
 --
 ALTER TABLE `ticket`
-  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
+  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
 
 --
 -- AUTO_INCREMENT for table `users`
