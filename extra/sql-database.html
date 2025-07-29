@@ -35,3 +35,19 @@ VALUES (
   )
 );
 
+
+
+Product Table:
+INSERT INTO `product`(`product_id`, `name`, `desc`, `image_url`, `stock`, `price`, `sell_price`, `rating`, `created_at`, `modified_at`, `deleted_at`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]','[value-9]','[value-10]','[value-11]')
+
+User Table:
+INSERT INTO `users`(`user_id`, `name`, `email`, `password`, `c_password`, `number`, `address`, `created_at`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]')
+
+Cart Table:
+SELECT `cart_id`, `user_id`, `products_qty`, `created_at` FROM `cart` WHERE 1
+
+Here: 
+cart.user_id = users.user_id
+products_qty = {
+  [product.product_id, qty]
+}

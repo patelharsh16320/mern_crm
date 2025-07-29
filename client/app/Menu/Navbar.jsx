@@ -11,6 +11,7 @@ import {
 } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const navigation = [
   { name: 'Dashboard', href: '/' },
@@ -26,7 +27,14 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
+
 export default function Navbar({ onLogoClick }) {
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    localStorage.removeItem('user');
+    router.push('/login')
+  }
   return (
     <Disclosure as="nav" className="bg-white shadow-sm border-b z-50">
       {({ open }) => (
@@ -91,6 +99,7 @@ export default function Navbar({ onLogoClick }) {
                       />
                     </MenuButton>
                   </div>
+
                   <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-xl ring-1 ring-black/10">
                     <MenuItem>
                       {({ active }) => (
@@ -108,7 +117,7 @@ export default function Navbar({ onLogoClick }) {
                     <MenuItem>
                       {({ active }) => (
                         <Link
-                          href="#"
+                          href="/settings"
                           className={classNames(
                             active ? 'bg-gray-100' : '',
                             'block px-4 py-2 text-sm text-gray-700'
@@ -120,15 +129,16 @@ export default function Navbar({ onLogoClick }) {
                     </MenuItem>
                     <MenuItem>
                       {({ active }) => (
-                        <Link
-                          href="#"
+                        <button
+                          onClick={handleSignOut}
                           className={classNames(
                             active ? 'bg-gray-100' : '',
-                            'block px-4 py-2 text-sm text-gray-700'
+                            'block w-full text-left px-4 py-2 text-sm text-gray-700'
                           )}
+                          style={{ 'border': 'none' }}
                         >
                           Sign out
-                        </Link>
+                        </button>
                       )}
                     </MenuItem>
                   </MenuItems>

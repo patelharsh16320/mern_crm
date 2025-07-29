@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { fetchAllProduct } from '../(api)/utils/showAllData';
+import { createCart } from '../(api)/utils/allapi';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -23,31 +24,46 @@ const Page = () => {
         getProducts();
     }, []);
 
-    const addToCart = (product) => {
+    const addToCart = async (product) => {
         try {
-            // Get existing cart or initialize
-            const existingCart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user?.user_id;
 
-            // Check if product is already in cart
-            const existingProductIndex = existingCart.findIndex((item) => item.id === product.id);
-
-            if (existingProductIndex !== -1) {
-                // Update quantity if exists
-                existingCart[existingProductIndex].quantity += 1;
-            } else {
-                // Add new product with quantity
-                existingCart.push({ ...product, quantity: 1 });
+            if (!userId) {
+                toast.error('User not logged in');
+                return;
             }
 
-            // Save to localStorage
+            // Local cart logic
+            let existingCart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const productIndex = existingCart.findIndex(item => item.product_id === product.product_id);
+
+            if (productIndex !== -1) {
+                existingCart[productIndex].qty += 1;
+            } else {
+                existingCart.push({ product_id: product.product_id, qty: 1 });
+            }
+
             localStorage.setItem('cart', JSON.stringify(existingCart));
             toast.success(`${product.name} added to cart`);
+
+            // Call backend API
+            const response = await createCart(userId, existingCart);
+
+            if (response.statusCode === 201) {
+                console.log('Cart synced:', response.cart_id);
+                // Optional: Save cart_id in localStorage if needed for update
+                localStorage.setItem('cart_id', response.cart_id);
+            } else {
+                console.warn('Cart sync failed:', response.message);
+                toast.warn('Backend cart sync failed');
+            }
+
         } catch (error) {
-            console.error('Error adding to cart:', error);
-            toast.error('Failed to add item to cart');
+            console.error('Add to Cart Error:', error);
+            toast.error('Error adding product to cart');
         }
     };
-
 
     return (
         <div className="p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
@@ -96,8 +112,9 @@ const Page = () => {
                                         🛒 Add to Cart
                                     </button>
 
-
-                                    <Link href="/product/checkout" className="flex-1 px-2 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-full hover:bg-green-200 transition duration-200 shadow-sm hover:shadow-md text-center" >💳 Buy Now </Link>
+                                    <Link href="/product/checkout" className="flex-1 px-2 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-full hover:bg-green-200 transition duration-200 shadow-sm hover:shadow-md text-center">
+                                        💳 Buy Now
+                                    </Link>
                                 </div>
 
                                 <div className="flex justify-between items-center text-sm text-gray-500 mt-2">

@@ -1,18 +1,18 @@
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API
 
 const getData = async (endpoint, options = {}) => {
-    try {
-        const res = await fetch(`${BASE_URL}${endpoint}`, {
-            method: 'GET',
-            cache: 'no-store',
-            ...options,
-        });
-        if (!res.ok) throw new Error(`Failed to fetch from ${endpoint}`);
-        return await res.json();
-    } catch (error) {
-        console.error(`Error fetching ${endpoint}:`, error.message);
-        throw error;
-    }
+  try {
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'GET',
+      cache: 'no-store',
+      ...options,
+    });
+    if (!res.ok) throw new Error(`Failed to fetch from ${endpoint}`);
+    return await res.json();
+  } catch (error) {
+    console.error(`Error fetching ${endpoint}:`, error.message);
+    throw error;
+  }
 };
 
 const fetchAllUsers = () => getData('/show-users');
@@ -23,6 +23,35 @@ const fetchAllProductCategory = () => getData('/show-product_category');
 const fetchAllProductCategoryMap = () => getData('/show-product_category_map');
 const fetchAllCart = () => getData('/show-cart');
 
+const fetchUpdatedCart = async (userId) => {
+  try {
+    const res = await fetch(`${BASE_URL}/cart-details/${userId}`);
+    if (!res.ok) {
+      throw new Error('Failed to fetch cart');
+    }
+    return await res.json();
+  } catch (err) {
+    console.error('Error fetching updated cart:', err);
+    throw err;
+  }
+};
+
+const updateCart = async (cartId, userId, updatedProducts) => {
+  const response = await fetch(`${BASE_URL}/update-cart/${cartId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      products_qty: updatedProducts,
+      created_at: new Date().toISOString().slice(0, 19).replace('T', ' ')
+    }),
+  });
+
+  return response.json();
+};
+
 export {
-    fetchAllUsers, fetchAllTicket, fetchAllRole, fetchAllProduct, fetchAllProductCategory, fetchAllProductCategoryMap, fetchAllCart
+  fetchAllUsers, fetchAllTicket, fetchAllRole, fetchAllProduct, fetchAllProductCategory, fetchAllProductCategoryMap, fetchAllCart, fetchUpdatedCart, updateCart
 };
