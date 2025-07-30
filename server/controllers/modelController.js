@@ -29,7 +29,6 @@ const getAllRecords = async (req, res) => {
   }
 }
 
-
 module.exports = {
   getAllRecords
 };

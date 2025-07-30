@@ -1,8 +1,11 @@
 'use client';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LoginUser } from '../(api)/utils/allapi';
 import { toast } from 'react-toastify';
+import Cookies from 'js-cookie';
+import { RiEyeFill, RiEyeOffFill } from 'react-icons/ri';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -10,6 +13,9 @@ export default function LoginPage() {
     email: '',
     password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => setShowPassword(prev => !prev);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,16 +25,22 @@ export default function LoginPage() {
   const handleReset = () => {
     setFormData({ email: '', password: '' });
   };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const data = await LoginUser(formData);
-
       if (data.statusCode === 200) {
         const { password, ...userWithoutSensitiveData } = data.user;
 
+        Cookies.set('user', encodeURIComponent(JSON.stringify(userWithoutSensitiveData)), {
+          path: '/',
+          expires: 1, // in days
+        })
+
         localStorage.setItem('user', JSON.stringify(userWithoutSensitiveData));
-        toast.success(data.message || 'Login successful');
+
+        toast.success('Login successful');
         router.push('/');
       } else if (data.statusCode === 401 || data.statusCode === 404) {
         toast.error(data.message || 'Invalid email or password');
@@ -37,7 +49,6 @@ export default function LoginPage() {
       } else {
         toast.error(data.message || 'Unexpected error');
       }
-
     } catch (err) {
       toast.error('Server error. Please try again.');
     }
@@ -68,16 +79,26 @@ export default function LoginPage() {
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              placeholder="••••••••"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="••••••••"
+                className="mt-1 block w-full p-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+                tabIndex={-1}
+              >
+                {showPassword ? <RiEyeOffFill /> : <RiEyeFill />}
+              </button>
+            </div>
           </div>
 
           <div className="flex justify-between">

@@ -10,28 +10,28 @@ const Sidebar = () => {
     {
       title: 'Client',
       links: [
-        { label: 'All Clients', href: '/client/show-admin' },
+        { label: 'All Clients', href: '/show-admin/client' },
         { label: 'Add New', href: '/client/create-user' },
       ],
     },
     {
       title: 'Product',
       links: [
-        { label: 'All Products', href: '/product/show-admin' },
-        { label: 'Add New', href: '/product/show-admin/add' },
+        { label: 'All Products', href: '/show-admin/product' },
+        { label: 'Add New', href: '/show-admin/product/add' },
       ],
     },
     {
       title: 'Ticket',
       links: [
-        { label: 'All Tickets', href: '/ticket/show-admin' },
+        { label: 'All Tickets', href: '/show-admin/ticket' },
       ],
     },
     {
-      title: 'User',
+      title: 'Users',
       links: [
         { label: 'User', href: '/client/role' },
-         { label: 'Add New', href: '/client/create-user' },
+        //  { label: 'Add New', href: '/client/create-user' },
       ],
     },
   ];
