@@ -119,55 +119,7 @@ const deleteAllUsers = async (req, res) => {
     }
 }
 
-// For login
-// const loginUser = async (req, res) => {
-//     try {
-//         const { email, password } = req.body;
-//         console.log(req.body);
-
-//         if (!email || !password) {
-//             return res.status(400).json({ message: 'Email & Password are required', statusCode: 400 });
-//         }
-
-//         const sql = `SELECT * FROM users WHERE email = ? LIMIT 1`;
-
-//         conn.query(sql, [email], async (err, result) => {
-//             if (err) {
-//                 return res.status(500).json({ message: 'DB Error', statusCode: 500 });
-//             }
-
-//             if (result.length === 0) {
-//                 return res.status(404).json({ message: 'User not found', statusCode: 404 });
-//             }
-
-//             const user = result[0];
-
-//             const isMatch = await bcrypt.compare(password, user.password);
-
-//             console.log('password', password);
-//             console.log('user.password', user.password);
-//             console.log('isMatch', isMatch);
-
-//             if (!isMatch) {
-//                 return res.status(401).json({ message: 'Invalid credentials', statusCode: 401 });
-//             }
-
-//             return res.status(200).json({
-//                 message: 'Login Successful',
-//                 statusCode: 200,
-//                 user: {
-//                     user_id: user.user_id,
-//                     name: user.name,
-//                     email: user.email,
-//                     number: user.number,
-//                     address: user.address,
-//                 },
-//             });
-//         });
-//     } catch (err) {
-//         return res.status(500).json({ message: 'Internal server error', statusCode: 500 });
-//     }
-// };
+// Login User
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -180,7 +132,8 @@ const loginUser = async (req, res) => {
 
         conn.query(userQuery, [email], async (err, result) => {
             if (err) {
-                return res.status(500).json({ message: 'DB Error', statusCode: 500 });
+                console.error('DB Error (userQuery):', err); 
+                return res.status(500).json({ message: 'Database error while fetching user', statusCode: 500 });
             }
 
             if (result.length === 0) {
@@ -189,20 +142,18 @@ const loginUser = async (req, res) => {
 
             const user = result[0];
             const isMatch = await bcrypt.compare(password, user.password);
-
             if (!isMatch) {
                 return res.status(401).json({ message: 'Invalid credentials', statusCode: 401 });
             }
 
-            // Now fetch the role
             const roleQuery = `SELECT role FROM role WHERE email = ? LIMIT 1`;
             conn.query(roleQuery, [email], (roleErr, roleResult) => {
                 if (roleErr) {
-                    return res.status(500).json({ message: 'Role DB Error', statusCode: 500 });
+                    console.error('DB Error (roleQuery):', roleErr);
+                    return res.status(500).json({ message: 'Database error while fetching role', statusCode: 500 });
                 }
 
-                const role = roleResult[0]?.role || 'user'; // Default to 'user' if not found
-
+                const role = roleResult[0]?.role || 'user';
                 return res.status(200).json({
                     message: 'Login Successful',
                     statusCode: 200,
@@ -218,9 +169,15 @@ const loginUser = async (req, res) => {
             });
         });
     } catch (err) {
-        return res.status(500).json({ message: 'Internal server error', statusCode: 500 });
+        console.error('Unhandled Server Error:', err); 
+        return res.status(500).json({
+            message: 'Internal server error',
+            statusCode: 500,
+            error: err.message 
+        });
     }
 };
+
 
 
 //! *************** User API End 

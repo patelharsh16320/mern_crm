@@ -28,6 +28,12 @@ const Sidebar = () => {
       ],
     },
     {
+      title: 'Invoice',
+      links: [
+        { label: 'Invoice', href: '/product/invoice' },
+      ],
+    },
+    {
       title: 'Users',
       links: [
         { label: 'User', href: '/client/role' },

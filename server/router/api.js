@@ -13,7 +13,6 @@ router.route('/').get(Home);
 router.get('/show-:table', getAllRecords);
 router.get('/cart-details/:user_id', showDataOfCart);
 
-
 //* Post API
 router.route('/create-user').post(createUser);
 router.route('/update-user').post(updateUser);

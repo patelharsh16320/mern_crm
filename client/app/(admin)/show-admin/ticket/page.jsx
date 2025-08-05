@@ -20,7 +20,6 @@ export default function ShowAdmin() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [formData, setFormData] = useState({ ticket_id: '', subject: '', status: '' });
-  // const { sortedData: filteredTickets, sortConfig, handleSort } = useSortable(tickets);
   const filteredData = selectedStatus === 'all'
     ? tickets
     : tickets.filter(ticket => ticket.status === selectedStatus);

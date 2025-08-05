@@ -9,7 +9,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-
+import HomeContent from './component/HomeContent';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Page = () => {
@@ -65,6 +65,7 @@ const Page = () => {
 
   return (
     <>
+      <HomeContent />
       <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 py-12 px-4 flex justify-center">
         <div className="w-full max-w-4xl bg-white rounded-3xl shadow-lg p-10">
           <div className="mb-10 text-center">

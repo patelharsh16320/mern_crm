@@ -117,6 +117,10 @@ export default function LoginPage() {
             </button>
           </div>
         </form>
+        <div className='grid'>
+          <p>Username: harsh@gmail.com</p>
+          <p>Password: harsh123</p>
+        </div>
       </div>
     </div>
   );
