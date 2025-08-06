@@ -28,24 +28,22 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
+
 export default function Navbar({ onLogoClick }) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState({ name: '', email: '', number: '', address: '' });
 
-  // This ensures auth state updates correctly after page reload or login
-  useEffect(() => {
-    const checkAuth = () => {
-      const user = localStorage.getItem('user');
-      setIsAuthenticated(!!user);
-    };
-
-    checkAuth(); // initial check
-
-    // Listen for route changes to update auth state
-    const interval = setInterval(checkAuth, 500); // simple polling fix for client navigation
-
-    return () => clearInterval(interval);
-  }, []);
+useEffect(() => {
+  const localUser = JSON.parse(localStorage.getItem('user'));
+  if (localUser) {
+    setIsAuthenticated(true);
+    setUserData(localUser);
+  } else {
+    setIsAuthenticated(false);
+    setUserData({ name: '', email: '', number: '', address: '' });
+  }
+}, []);
 
   const handleSignOut = () => {
     localStorage.removeItem('user');
@@ -115,11 +113,15 @@ export default function Navbar({ onLogoClick }) {
                         Sign Out
                       </button>
                     )}
+                    
                   </div>
                 </div>
               </div>
 
               {/* Right Menu */}
+             {isAuthenticated && (
+               <p className='text-blue-500 font-semibold'>{userData.name}</p>
+             )}
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                 <button
                   type="button"

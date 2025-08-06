@@ -135,7 +135,7 @@ export default function TicketPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <input name="subject" value={formData.subject} onChange={handleChange} placeholder="Subject" required className="w-full border p-2 rounded" />
               <select name="status" value={formData.status} onChange={handleChange} required className="w-full border p-2 rounded">
-                <option value="">Select status</option>
+                {/* <option value="">Select status</option> */}
                 {Object.entries(statusLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
               </select>
               <div className="flex justify-end gap-4">

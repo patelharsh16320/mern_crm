@@ -199,7 +199,7 @@ export default function ShowAdmin() {
                     <input name={field} value={formData[field]} onChange={e => setFormData({ ...formData, [field]: e.target.value })} required className="mt-1 w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-blue-500" />
                   ) : (
                     <select name={field} value={formData[field]} onChange={e => setFormData({ ...formData, [field]: e.target.value })} required className="mt-1 w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-blue-500">
-                      <option value="">Select status</option>
+                      {/* <option value="">Select status</option> */}
                       {Object.entries(statusLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                     </select>
                   )}

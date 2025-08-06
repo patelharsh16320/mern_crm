@@ -61,26 +61,51 @@ const createUser = async (req, res) => {
 // update new User 
 const updateUser = async (req, res) => {
     try {
-        const { user_id, name, email, password, c_password, number, address, created_at } = req.body;
-        if (!user_id) { return res.json({ message: "User ID and name are required", statusCode: 400 }); }
+        const { user_id, name, email, password, c_password, number, address } = req.body;
 
-        const sql = `UPDATE users SET 
-        name = ?,
-        email = ?,
-        password = ?,
-        c_password = ?,
-        number = ?,
-        address = ?,
-        created_at = ?
-        WHERE user_id= ?`;
+        if (!user_id || !name || !email || !password || !c_password || !number || !address) {
+            return res.status(400).json({ message: "All fields are required", statusCode: 400 });
+        }
 
-        const value = [name, email, password, c_password, number, address, created_at, user_id];
+        if (password !== c_password) {
+            return res.status(400).json({ message: "Password & Confirm Password do not match", statusCode: 400 });
+        }
 
-        conn.query(sql, value, (err, result) => {
-            if (err) { return res.json({ message: "User name is already exist...!, try one name", statusCode: 100, error: err.message }); }
-            res.json({ message: "User updated successfully.", statusCode: 200 });
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const sql = `
+      UPDATE users SET 
+        name = ?, 
+        email = ?, 
+        password = ?, 
+        c_password = ?, 
+        number = ?, 
+        address = ?, 
+        created_at = NOW()
+      WHERE user_id = ?
+    `;
+
+        const values = [
+            name,
+            email,
+            hashedPassword,
+            hashedPassword,
+            number,
+            address,
+            user_id
+        ];
+
+        conn.query(sql, values, (err, result) => {
+            if (err) {
+                return res.status(409).json({ message: "Failed to update user", statusCode: 409, error: err.message });
+            }
+
+            return res.status(200).json({ message: "User updated successfully", statusCode: 200 });
         });
-    } catch (error) { return res.json({ message: "Internal server error on create User", statusCode: 500, error: error.message }); }
+
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error", statusCode: 500, error: error.message });
+    }
 };
 
 // Delete User
@@ -121,64 +146,65 @@ const deleteAllUsers = async (req, res) => {
 
 // Login User
 const loginUser = async (req, res) => {
-    try {
-        const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
+    console.log("Login Request:", req.body);
 
-        if (!email || !password) {
-            return res.status(400).json({ message: 'Email & Password are required', statusCode: 400 });
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email & Password are required', statusCode: 400 });
+    }
+
+    const userQuery = `SELECT * FROM users WHERE email = ? LIMIT 1`;
+    conn.query(userQuery, [email], async (err, result) => {
+      if (err) {
+        console.error('DB Error (userQuery):', err);
+        return res.status(500).json({ message: 'Database error while fetching user', statusCode: 500 });
+      }
+
+      if (result.length === 0) {
+        return res.status(404).json({ message: 'User not found', statusCode: 404 });
+      }
+
+      const user = result[0];
+
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid credentials', statusCode: 401 });
+      }
+
+      const roleQuery = `SELECT role FROM role WHERE email = ? LIMIT 1`;
+      conn.query(roleQuery, [email], (roleErr, roleResult) => {
+        if (roleErr) {
+          console.error('DB Error (roleQuery):', roleErr);
+          return res.status(500).json({ message: 'Database error while fetching role', statusCode: 500 });
         }
 
-        const userQuery = `SELECT * FROM users WHERE email = ? LIMIT 1`;
+        const role = roleResult[0]?.role || 'user';
 
-        conn.query(userQuery, [email], async (err, result) => {
-            if (err) {
-                console.error('DB Error (userQuery):', err); 
-                return res.status(500).json({ message: 'Database error while fetching user', statusCode: 500 });
-            }
-
-            if (result.length === 0) {
-                return res.status(404).json({ message: 'User not found', statusCode: 404 });
-            }
-
-            const user = result[0];
-            const isMatch = await bcrypt.compare(password, user.password);
-            if (!isMatch) {
-                return res.status(401).json({ message: 'Invalid credentials', statusCode: 401 });
-            }
-
-            const roleQuery = `SELECT role FROM role WHERE email = ? LIMIT 1`;
-            conn.query(roleQuery, [email], (roleErr, roleResult) => {
-                if (roleErr) {
-                    console.error('DB Error (roleQuery):', roleErr);
-                    return res.status(500).json({ message: 'Database error while fetching role', statusCode: 500 });
-                }
-
-                const role = roleResult[0]?.role || 'user';
-                return res.status(200).json({
-                    message: 'Login Successful',
-                    statusCode: 200,
-                    user: {
-                        user_id: user.user_id,
-                        name: user.name,
-                        email: user.email,
-                        number: user.number,
-                        address: user.address,
-                        role: role
-                    }
-                });
-            });
+        return res.status(200).json({
+          message: 'Login Successful',
+          statusCode: 200,
+          user: {
+            user_id: user.user_id,
+            name: user.name,
+            email: user.email,
+            number: user.number,
+            address: user.address,
+            role: role
+          }
         });
-    } catch (err) {
-        console.error('Unhandled Server Error:', err); 
-        return res.status(500).json({
-            message: 'Internal server error',
-            statusCode: 500,
-            error: err.message 
-        });
-    }
+      });   
+    });
+
+  } catch (err) {
+    console.error('Unhandled Server Error:', err);
+    return res.status(500).json({
+      message: 'Internal server error',
+      statusCode: 500,
+      error: err.message
+    });
+  }
 };
-
-
 
 //! *************** User API End 
 
