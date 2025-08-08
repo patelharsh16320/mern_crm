@@ -322,19 +322,25 @@ const updateCart = async ({ user_id, products_qty }) => {
 // Create New Contact 
 const createContact = async (formData) => {
   try {
+    // Get user_id from localStorage if exists
     let user_id = null;
     try {
       const stored = localStorage.getItem('users');
       if (stored) {
         const parsed = JSON.parse(stored);
+
+        // Handle both array & object cases
         if (Array.isArray(parsed) && parsed[0]?.user_id) {
           user_id = parsed[0].user_id;
+        } else if (parsed?.user_id) {
+          user_id = parsed.user_id;
         }
       }
     } catch (err) {
       console.error('Error reading localStorage:', err);
     }
 
+    // Current datetime in MySQL format
     const now = new Date();
     const created_at = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
       now.getDate()
@@ -364,7 +370,6 @@ const createContact = async (formData) => {
     throw err;
   }
 };
-
 
 // Delete Single Contact
 const deleteContactById = async (ContactData) => {

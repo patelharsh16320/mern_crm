@@ -69,7 +69,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ToastContainer />
-        <div className="flex min-h-screen bg-gray-100 relative">
+        <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 relative">
           {/* Sidebar */}
           {renderSidebar && (
             <aside

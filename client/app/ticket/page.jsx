@@ -9,7 +9,7 @@ import {
 } from '../(api)/utils/allapi';
 import { fetchAllTicket } from '../(api)/utils/showAllData';
 import { toast, ToastContainer } from 'react-toastify';
-import { FaEdit } from 'react-icons/fa';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import { useSortable } from '../component/common';
 
 export default function TicketPage() {
@@ -40,11 +40,14 @@ export default function TicketPage() {
   };
 
   useEffect(() => { getTickets(); }, []);
+
   const getTickets = async () => {
     try {
       const res = await fetchAllTicket();
       setTickets(res.users || []);
-    } catch { toast.error('Failed to fetch tickets'); }
+    } catch {
+      toast.error('Failed to fetch tickets');
+    }
   };
 
   const openCreateModal = () => {
@@ -88,73 +91,91 @@ export default function TicketPage() {
   const totalPages = Math.ceil(filteredTickets.length / itemsPerPage);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">All Tickets</h1>
-        <div className="flex gap-2">
-          <p className="px-4 py-2 bg-pink-600 text-white rounded-md">Total: {tickets.length}</p>
-          <button onClick={openCreateModal} className="px-4 py-2 bg-blue-600 text-white rounded-md">+ New</button>
+    <div className="p-6 max-w-7xl mx-auto min-h-screen">
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        <h1 className="text-3xl font-bold text-gray-800">🎟 Ticket Management</h1>
+        <div className="flex gap-3">
+          <span className="px-4 py-2 bg-pink-600 text-white rounded-lg shadow">Total: {tickets.length}</span>
+          <button onClick={openCreateModal} className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition">+ New Ticket</button>
         </div>
       </div>
 
-      <table className="min-w-full bg-white border">
-        <thead className="bg-gray-100">
-          <tr>
-            {['Index', 'Subject', 'Status', 'Created At', 'Last Updated', 'Edit'].map((label, i) => (
-              <th key={i} className="px-4 py-2 border cursor-pointer" onClick={() => handleSort(label.toLowerCase().replace(/ /g, '_'))}>
-                {label} {sortConfig.key === label.toLowerCase().replace(/ /g, '_') && (sortConfig.direction === 'asc' ? '▲' : '▼')}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedTickets.map((ticket, i) => (
-            <tr key={ticket.ticket_id}>
-              <td className="py-2 px-4 border-b">{(currentPage - 1) * itemsPerPage + i + 1}</td>
-              <td className="py-2 px-4 border-b">{ticket.subject}</td>
-              <td className="py-2 px-4 border-b">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[ticket.status] || 'bg-gray-200 text-gray-800'}`}>
-                  {statusLabels[ticket.status] || ticket.status}
-                </span>
-              </td>
-              <td className="py-2 px-4 border-b">{new Date(ticket.created_at).toLocaleString()}</td>
-              <td className="py-2 px-4 border-b">{new Date(ticket.created_at).toLocaleString()}</td>
-              <td className="py-2 px-4 border-b">
-                <button onClick={() => handleEdit(ticket)} className="text-blue-600 hover:underline"><FaEdit /></button>
-              </td>
+      {/* Table */}
+      <div className="overflow-x-auto bg-white shadow-md rounded-lg border border-gray-200">
+        <table className="w-full text-left">
+          <thead className="bg-gray-100">
+            <tr>
+              {['Index', 'Subject', 'Status', 'Created At', 'Last Updated', 'Edit', 'Delete'].map((label, i) => (
+                <th
+                  key={i}
+                  className="px-4 py-3 border-b text-gray-700 font-semibold cursor-pointer"
+                  onClick={() => handleSort(label.toLowerCase().replace(/ /g, '_'))}
+                >
+                  {label} {sortConfig.key === label.toLowerCase().replace(/ /g, '_') && (sortConfig.direction === 'asc' ? '▲' : '▼')}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {paginatedTickets.map((ticket, i) => (
+              <tr key={ticket.ticket_id} className="hover:bg-gray-50 transition">
+                <td className="py-3 px-4 border-b">{(currentPage - 1) * itemsPerPage + i + 1}</td>
+                <td className="py-3 px-4 border-b">{ticket.subject}</td>
+                <td className="py-3 px-4 border-b">
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[ticket.status] || 'bg-gray-200 text-gray-800'}`}>
+                    {statusLabels[ticket.status] || ticket.status}
+                  </span>
+                </td>
+                <td className="py-3 px-4 border-b">{new Date(ticket.created_at).toLocaleString()}</td>
+                <td className="py-3 px-4 border-b">{new Date(ticket.created_at).toLocaleString()}</td>
+                <td className="py-3 px-4 border-b">
+                  <button onClick={() => handleEdit(ticket)} className="text-blue-600 hover:text-blue-800">
+                    <FaEdit />
+                  </button>
+                </td>
+                <td className="py-3 px-4 border-b">
+                  <button onClick={() => deleteTicketById(ticket.ticket_id).then(getTickets)} className="text-red-600 hover:text-red-800">
+                    <FaTrash />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center mt-6 space-x-2">
+        <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1} className="px-4 py-2 border rounded disabled:opacity-50 bg-white shadow hover:bg-gray-100">Prev</button>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`px-4 py-2 border rounded shadow ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-white hover:bg-gray-100'}`}>
+            {i + 1}
+          </button>
+        ))}
+        <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages} className="px-4 py-2 border rounded disabled:opacity-50 bg-white shadow hover:bg-gray-100">Next</button>
+      </div>
 
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg relative">
-            <h2 className="text-lg font-semibold mb-4 text-gray-800">{isEditMode ? 'Update Ticket' : 'Create Ticket'}</h2>
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">{isEditMode ? 'Update Ticket' : 'Create Ticket'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <input name="subject" value={formData.subject} onChange={handleChange} placeholder="Subject" required className="w-full border p-2 rounded" />
-              <select name="status" value={formData.status} onChange={handleChange} required className="w-full border p-2 rounded">
-                {/* <option value="">Select status</option> */}
+              <input name="subject" value={formData.subject} onChange={handleChange} placeholder="Subject" required className="w-full border p-3 rounded focus:outline-none focus:ring focus:ring-blue-300" />
+              <select name="status" value={formData.status} onChange={handleChange} required className="w-full border p-3 rounded focus:outline-none focus:ring focus:ring-blue-300">
                 {Object.entries(statusLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
               </select>
               <div className="flex justify-end gap-4">
-                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border rounded">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">{isEditMode ? 'Update' : 'Create'}</button>
+                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border rounded bg-gray-100 hover:bg-gray-200">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">{isEditMode ? 'Update' : 'Create'}</button>
               </div>
             </form>
-            <button className="absolute top-2 right-2 text-gray-500" onClick={() => setShowModal(false)}>✕</button>
+            <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-700" onClick={() => setShowModal(false)}>✕</button>
           </div>
         </div>
       )}
-
-      <div className="flex justify-center items-center mt-4 space-x-2">
-        <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 border rounded disabled:opacity-50">Prev</button>
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`px-3 py-1 border rounded ${currentPage === i + 1 ? 'bg-blue-600 text-white' : ''}`}>{i + 1}</button>
-        ))}
-        <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
-      </div>
 
       <ToastContainer />
     </div>

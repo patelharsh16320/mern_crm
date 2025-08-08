@@ -30,7 +30,7 @@ export default function ContactPage() {
   return (
     <>
       <Gsap />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-14 px-4">
+      <div className="min-h-screen py-14 px-4">
         <div className="max-w-6xl mx-auto space-y-14">
 
           {/* Contact Info */}
