@@ -37,9 +37,14 @@ const Sidebar = () => {
       title: 'Users',
       links: [
         { label: 'User', href: '/client/role' },
-        //  { label: 'Add New', href: '/client/create-user' },
       ],
     },
+    {
+      title: 'Messages',
+      links: [
+        { label: 'All Message', href: '/show-admin/contact' },
+      ],
+    }
   ];
 
   return (

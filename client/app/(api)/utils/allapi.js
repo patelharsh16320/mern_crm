@@ -316,10 +316,81 @@ const updateCart = async ({ user_id, products_qty }) => {
   }
 };
 
-
 //! For Cart End
 
-//! For Role End
+//! For Contact Start
+// Create New Contact 
+const createContact = async (formData) => {
+  try {
+    let user_id = null;
+    try {
+      const stored = localStorage.getItem('users');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed[0]?.user_id) {
+          user_id = parsed[0].user_id;
+        }
+      }
+    } catch (err) {
+      console.error('Error reading localStorage:', err);
+    }
+
+    const now = new Date();
+    const created_at = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
+      now.getDate()
+    ).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(
+      now.getMinutes()
+    ).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+    // API call
+    const res = await fetch(`${BASE_URL}/create-contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id,
+        name: formData.username,
+        email: formData.email,
+        number: formData.phone,
+        message: formData.message,
+        created_at
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to create user');
+
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+
+// Delete Single Contact
+const deleteContactById = async (ContactData) => {
+  const res = await fetch(`${BASE_URL}/delete-contact/${ContactData}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to delete Product");
+  }
+
+  return await res.json();
+};
+
+// Delete All Contact
+const deleteAllContact = async () => {
+  const res = await fetch(`${BASE_URL}/delete-allcontact`, {
+    method: 'DELETE',
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to delete all ticket');
+  return data;
+};
+
+//! For Contact End
 
 export {
   //? Users Export
@@ -335,5 +406,8 @@ export {
   createNewProduct, updateProductById, deleteProductById, deleteAllProduct,
 
   // ? cart
-  createCart, updateCart 
+  createCart, updateCart,
+
+  // ? Contact
+  createContact, deleteContactById, deleteAllContact
 };

@@ -13,7 +13,8 @@ const getAllRecords = async (req, res) => {
       'product_category_map',
       'cart',
       'invoice',
-      'invoice_items'
+      'invoice_items',
+      'contacts'
     ];
 
     if (!validTables.includes(tableName)) {

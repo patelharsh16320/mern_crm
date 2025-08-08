@@ -6,7 +6,8 @@ const { createProduct, updateProduct, deleteProduct, deleteAllProduct, createCat
 const { updateRole, deleteRole, deleteAllRoles } = require('../controllers/roleController');
 const { getAllRecords } = require('../controllers/modelController')
 const { createCart, showDataOfCart, updateCart } = require('../controllers/cartController')
-const { createInvoice, updateInvoice, deleteInvoice,  deleteAllInvoice } = require('../controllers/invoiceController')
+const { createInvoice, updateInvoice, deleteInvoice, deleteAllInvoice } = require('../controllers/invoiceController')
+const { createContact, deleteContact, deleteAllContact } = require('../controllers/contactController')
 const router = express.Router();
 
 //* Get API 
@@ -35,6 +36,7 @@ router.route('/update-cart/').post(updateCart);
 router.route('/create-invoice').post(createInvoice);
 router.route('/update-invoice/').post(updateInvoice);
 
+router.route('/create-contact').post(createContact);
 
 //* Delete API
 router.route('/delete-user/:id').delete(deleteUser);
@@ -53,5 +55,8 @@ router.route('/delete-product/:id').delete(deleteProduct);
 router.route('/delete-allproduct').delete(deleteAllProduct);
 router.route('/delete-category/:id').delete(deleteCategory);
 router.route('/delete-allcategory').delete(deleteAllCategories);
+
+router.route('/delete-contact/:id').delete(deleteContact);
+router.route('/delete-allcontact').delete(deleteAllContact);
 
 module.exports = router;

@@ -148,7 +148,6 @@ const deleteAllUsers = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log("Login Request:", req.body);
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Email & Password are required', statusCode: 400 });

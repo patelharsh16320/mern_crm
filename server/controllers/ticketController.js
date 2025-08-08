@@ -7,7 +7,7 @@ const allowedStatuses = ['backlog', 'to_do', 'in_progress', 'on_hold', 'review',
 const createTicket = async (req, res) => {
     try {
         const { subject, status } = req.body;
-
+        // console.log(req.body);
         // Validate required fields
         if (!subject || !status) {
             return res.json({ message: "Please provide subject and status", statusCode: 400 });

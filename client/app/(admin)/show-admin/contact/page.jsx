@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import Gsap from '@/app/component/Gsap';
-import { createContact } from '../../(api)/utils/allapi';
+import { createContact } from '../../../(api)/utils/allapi';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -16,16 +16,49 @@ export default function ContactPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await createContact(formData);
-      toast.success('Message sent successfully!');
-      setFormData({ username: '', email: '', phone: '', message: '' });
-    } catch (err) {
-      toast.error(err.message || 'Failed to send message');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // Get user_id from localStorage if exists
+  let user_id = null;
+  try {
+    const stored = localStorage.getItem('users');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed[0]?.user_id) {
+        user_id = parsed[0].user_id;
+      }
     }
+  } catch (err) {
+    console.error('Error reading localStorage:', err);
+  }
+
+  // Current datetime in MySQL format
+  const now = new Date();
+  const created_at = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
+    now.getDate()
+  ).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(
+    now.getMinutes()
+  ).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+  const payload = {
+    user_id,
+    name: formData.username,
+    email: formData.email,
+    number: formData.phone,
+    message: formData.message,
+    created_at,
   };
+
+  try {
+    await createContact(payload);
+    toast.success('Message sent successfully!');
+    setFormData({ username: '', email: '', phone: '', message: '' });
+  } catch (err) {
+    toast.error(err.message || 'Failed to send message');
+  }
+};
+
 
   return (
     <>
