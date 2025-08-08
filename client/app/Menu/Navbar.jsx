@@ -22,6 +22,7 @@ const navigation = [
   { name: 'Cart', href: '/product/cart' },
   { name: 'Checkout', href: '/product/checkout' },
   { name: 'Ticket', href: '/ticket' },
+  { name: 'Contact', href: '/contact' },
 ];
 
 function classNames(...classes) {
