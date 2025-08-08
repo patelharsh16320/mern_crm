@@ -1,152 +1,141 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState, useMemo } from "react";
+import { fetchAllContact } from '../../../(api)/utils/showAllData';
+import { deleteContactById, deleteAllContact } from '../../../(api)/utils/allapi';
 import { toast } from 'react-toastify';
-import Gsap from '@/app/component/Gsap';
-import { createContact } from '../../../(api)/utils/allapi';
 
-export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    phone: '',
-    message: '',
-  });
+export default function MessagesPage() {
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sortConfig, setSortConfig] = useState({});
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 5;
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  // Get user_id from localStorage if exists
-  let user_id = null;
-  try {
-    const stored = localStorage.getItem('users');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed[0]?.user_id) {
-        user_id = parsed[0].user_id;
-      }
+  // Fetch all contacts
+  const loadContacts = async () => {
+    try {
+      const res = await fetchAllContact();
+      setContacts(res.users || []);
+      toast.success("Messages loaded");
+    } catch {
+      toast.error("Failed to load Messages");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error('Error reading localStorage:', err);
-  }
-
-  // Current datetime in MySQL format
-  const now = new Date();
-  const created_at = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
-    now.getDate()
-  ).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(
-    now.getMinutes()
-  ).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-
-  const payload = {
-    user_id,
-    name: formData.username,
-    email: formData.email,
-    number: formData.phone,
-    message: formData.message,
-    created_at,
   };
 
-  try {
-    await createContact(payload);
-    toast.success('Message sent successfully!');
-    setFormData({ username: '', email: '', phone: '', message: '' });
-  } catch (err) {
-    toast.error(err.message || 'Failed to send message');
-  }
-};
+  useEffect(() => { loadContacts(); }, []);
 
+  // Sorting handler
+  const requestSort = key => {
+    setSortConfig(prev =>
+      prev.key === key
+        ? { key, direction: prev.direction === "asc" ? "desc" : prev.direction === "desc" ? null : "asc" }
+        : { key, direction: "asc" }
+    );
+  };
+
+  // Apply sorting
+  const sortedContacts = useMemo(() => {
+    let data = [...contacts];
+    if (sortConfig.key && sortConfig.direction) {
+      data.sort((a, b) => {
+        let x = a[sortConfig.key], y = b[sortConfig.key];
+        if (sortConfig.key === "created_at") { x = new Date(x); y = new Date(y); }
+        return sortConfig.direction === "asc" ? (x > y ? 1 : -1) : (x < y ? 1 : -1);
+      });
+    }
+    return data;
+  }, [contacts, sortConfig]);
+
+  const currentRows = sortedContacts.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const totalPages = Math.ceil(sortedContacts.length / rowsPerPage);
+
+  // Delete single row
+  const delRow = async (id) => {
+    if (!confirm("Delete this contact?")) return;
+    try {
+      await deleteContactById(id);
+      setContacts(prev => prev.filter(c => c.contact_id !== id));
+      toast.success("Contact deleted");
+    } catch {
+      toast.error("Failed to delete contact");
+    }
+  };
+
+  // Delete all rows
+  const delAll = async () => {
+    if (!confirm("Delete ALL contacts?")) return;
+    try {
+      await deleteAllContact();
+      setContacts([]);
+      toast.success("All contacts deleted");
+    } catch {
+      toast.error("Failed to delete all contacts");
+    }
+  };
+
+  const sortIcon = col => sortConfig.key === col ? (sortConfig.direction === "asc" ? "▲" : "▼") : "";
+
+  const columns = [
+    { key: "contact_id", label: "#" },
+    { key: "name", label: "Name" },
+    { key: "email", label: "Email" },
+    { key: "number", label: "Number" },
+    { key: "message", label: "Message" },
+    { key: "created_at", label: "Created At" }
+  ];
 
   return (
-    <>
-      <Gsap />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-14 px-4">
-        <div className="max-w-6xl mx-auto space-y-14">
-
-          {/* Contact Info */}
-          <div className="grid md:grid-cols-3 gap-6 text-center">
-            {[
-              { label: 'Phone', value: '+91 98765 43210' },
-              { label: 'Email', value: 'info@example.com' },
-              { label: 'Address', value: '123 Street, Mumbai, India' },
-            ].map(({ label, value }) => (
-              <div
-                key={label}
-                className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 gsap-fade-in"
-              >
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">{label}</h3>
-                <p className="text-gray-600">{value}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Contact Form */}
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Image */}
-            <div className="gsap-zoom-in">
-              <img
-                src="/contact-us.svg"
-                alt="Contact"
-                className="w-full h-auto rounded-xl shadow-md"
-              />
-            </div>
-
-            {/* Form */}
-            <form
-              onSubmit={handleSubmit}
-              className="bg-white p-8 rounded-3xl shadow-lg space-y-6 gsap-slide-up border border-gray-100"
-            >
-              <h2 className="text-3xl font-bold text-blue-800">Get in Touch</h2>
-
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Your Name"
-                className="w-full px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 placeholder-gray-500 transition"
-                required
-              />
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Your Email"
-                className="w-full px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 placeholder-gray-500 transition"
-                required
-              />
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="Phone Number"
-                className="w-full px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 placeholder-gray-500 transition"
-              />
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                placeholder="Your Message"
-                rows="4"
-                className="w-full px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 placeholder-gray-500 transition"
-                required
-              ></textarea>
-
-              <button
-                type="submit"
-                className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-500 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-blue-600 shadow-md hover:shadow-lg transition duration-300"
-              >
-                Send Message
-              </button>
-            </form>
-          </div>
+    <div className="p-8 bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
+      <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-3xl font-bold text-blue-800">📩 All Messages</h1>
+          <button onClick={delAll} className="px-4 py-2 bg-red-600 text-white rounded-lg">Delete All</button>
         </div>
+        {loading ? <p>Loading...</p> : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border text-sm">
+                <thead className="bg-gradient-to-r from-blue-100 to-purple-100">
+                  <tr>
+                    {columns.map(col => (
+                      <th key={col.key} className="px-4 py-3 border cursor-pointer" onClick={() => requestSort(col.key)}>
+                        {col.label} {sortIcon(col.key)}
+                      </th>
+                    ))}
+                    <th className="px-4 py-3 border">Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentRows.length ? currentRows.map((c, i) => (
+                    <tr key={c.contact_id} className="hover:bg-blue-50">
+                      <td className="border px-4 py-3">{(page - 1) * rowsPerPage + i + 1}</td>
+                      <td className="border px-4 py-3">{c.name}</td>
+                      <td className="border px-4 py-3">{c.email}</td>
+                      <td className="border px-4 py-3">{c.number}</td>
+                      <td className="border px-4 py-3">{c.message}</td>
+                      <td className="border px-4 py-3">
+                        {new Date(c.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
+                      </td>
+                      <td className="border px-4 py-3 text-center">
+                        <button onClick={() => delRow(c.contact_id)} className="px-3 py-1 bg-red-500 text-white rounded">🗑</button>
+                      </td>
+                    </tr>
+                  )) : <tr><td colSpan="7" className="text-center py-4">No data</td></tr>}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex justify-between mt-4">
+              <button onClick={() => setPage(p => Math.max(p - 1, 1))} disabled={page === 1}
+                className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50">Previous</button>
+              <span>Page {page} of {totalPages}</span>
+              <button onClick={() => setPage(p => Math.min(p + 1, totalPages))} disabled={page === totalPages}
+                className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50">Next</button>
+            </div>
+          </>
+        )}
       </div>
-    </>
+    </div>
   );
 }
