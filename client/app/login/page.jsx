@@ -55,13 +55,23 @@ export default function LoginPage() {
   return (
     <>
       <Gsap /> 
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 overflow-hidden">
-        <div className="gsap-fade-in max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-100 px-4">
+        <div className="gsap-fade-in max-w-md w-full bg-white/80 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-gray-100">
+          
+          {/* Logo / Title */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-16 h-16 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full text-3xl font-bold shadow-md">
+              🔐
+            </div>
+            <h2 className="text-3xl font-extrabold text-gray-800 mt-4">Welcome Back</h2>
+            <p className="text-gray-500 text-sm">Please sign in to continue</p>
+          </div>
+
+          {/* Form */}
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
+                Email Address
               </label>
               <input
                 type="email"
@@ -70,8 +80,8 @@ export default function LoginPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                placeholder="Enter your email"
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                placeholder="you@example.com"
+                className="mt-1 block w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
               />
             </div>
 
@@ -88,38 +98,41 @@ export default function LoginPage() {
                   onChange={handleChange}
                   required
                   placeholder="••••••••"
-                  className="mt-1 block w-full p-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full p-3 pr-12 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700 transition"
                   tabIndex={-1}
                 >
-                  {showPassword ? <RiEyeOffFill /> : <RiEyeFill />}
+                  {showPassword ? <RiEyeOffFill size={20} /> : <RiEyeFill size={20} />}
                 </button>
               </div>
             </div>
 
-            <div className="flex justify-between">
+            {/* Actions */}
+            <div className="flex justify-between items-center">
               <button
                 type="reset"
                 onClick={handleReset}
-                className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
+                className="px-5 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition"
               >
                 Reset
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transition"
               >
                 Login
               </button>
             </div>
           </form>
-          <div className="grid mt-6 text-sm text-gray-500">
-            <p>Username: harsh@gmail.com</p>
-            <p>Password: harsh123</p>
+
+          {/* Test credentials */}
+          <div className="mt-8 p-4 bg-gray-50 rounded-lg text-xs text-gray-500 border border-gray-100">
+            <p><span className="font-medium">Username:</span> harsh@gmail.com</p>
+            <p><span className="font-medium">Password:</span> harsh123</p>
           </div>
         </div>
       </div>
