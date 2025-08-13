@@ -30,7 +30,7 @@ const Sidebar = () => {
     {
       title: 'Invoice',
       links: [
-        { label: 'Invoice', href: '/product/invoice' },
+        { label: 'All Invoice', href: '/show-admin/invoice' },
       ],
     },
     {

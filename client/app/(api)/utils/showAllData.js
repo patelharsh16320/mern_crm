@@ -23,6 +23,7 @@ const fetchAllProductCategory = () => getData('/show-product_category');
 const fetchAllProductCategoryMap = () => getData('/show-product_category_map');
 const fetchAllCart = () => getData('/show-cart');
 const fetchAllContact = () => getData('/show-contacts');
+const fetchAllInvoice = () => getData('/show-invoice');
 
 const fetchUpdatedCart = async (userId) => {
   try {
@@ -38,5 +39,5 @@ const fetchUpdatedCart = async (userId) => {
 };
 
 export {
-  fetchAllUsers, fetchAllTicket, fetchAllRole, fetchAllProduct, fetchAllProductCategory, fetchAllProductCategoryMap, fetchAllCart, fetchUpdatedCart, fetchAllContact
+  fetchAllUsers, fetchAllTicket, fetchAllRole, fetchAllProduct, fetchAllProductCategory, fetchAllProductCategoryMap, fetchAllCart, fetchUpdatedCart, fetchAllContact, fetchAllInvoice
 };

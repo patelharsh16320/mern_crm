@@ -29,22 +29,21 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-
 export default function Navbar({ onLogoClick }) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userData, setUserData] = useState({ name: '', email: '', number: '', address: '' });
 
-useEffect(() => {
-  const localUser = JSON.parse(localStorage.getItem('user'));
-  if (localUser) {
-    setIsAuthenticated(true);
-    setUserData(localUser);
-  } else {
-    setIsAuthenticated(false);
-    setUserData({ name: '', email: '', number: '', address: '' });
-  }
-}, []);
+  useEffect(() => {
+    const localUser = JSON.parse(localStorage.getItem('user'));
+    if (localUser) {
+      setIsAuthenticated(true);
+      setUserData(localUser);
+    } else {
+      setIsAuthenticated(false);
+      setUserData({ name: '', email: '', number: '', address: '' });
+    }
+  }, []);
 
   const handleSignOut = () => {
     localStorage.removeItem('user');
@@ -114,15 +113,15 @@ useEffect(() => {
                         Sign Out
                       </button>
                     )}
-                    
+
                   </div>
                 </div>
               </div>
 
               {/* Right Menu */}
-             {isAuthenticated && (
-               <p className='text-blue-500 font-semibold'>{userData.name}</p>
-             )}
+              {isAuthenticated && (
+                <p className='text-blue-500 font-semibold'>{userData.name}</p>
+              )}
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                 <button
                   type="button"

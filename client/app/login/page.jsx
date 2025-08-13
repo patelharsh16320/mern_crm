@@ -84,7 +84,7 @@ export default function LoginPage() {
                 className="mt-1 block w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
               />
             </div>
-
+ 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password
@@ -95,7 +95,7 @@ export default function LoginPage() {
                   id="password"
                   name="password"
                   value={formData.password}
-                  onChange={handleChange}
+                  onChange={handleChange} 
                   required
                   placeholder="••••••••"
                   className="mt-1 block w-full p-3 pr-12 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"

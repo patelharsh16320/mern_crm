@@ -397,6 +397,59 @@ const deleteAllContact = async () => {
 
 //! For Contact End
 
+//! For Invoice Start
+// Create New Invoice
+const createInvoice = async (formData) => {
+  try {
+    const res = await fetch(`${BASE_URL}/create-invoice`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: formData.username,
+        email: formData.email,
+        number: formData.phone,
+        doj: formData.doj,
+        address: formData.address,
+        password: "123456",
+        c_password: "123456"
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to create user');
+
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// Delete Single Invoice
+const deleteInvoiceById = async (InvoiceData) => {
+  const res = await fetch(`${BASE_URL}/delete-invoice/${InvoiceData}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to delete invoice");
+  }
+
+  return await res.json();
+};
+
+// Delete All Invoice
+const deleteAllInvoice = async () => {
+  const res = await fetch(`${BASE_URL}/delete-allinvoice`, {
+    method: 'DELETE',
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to delete all invoice');
+  return data;
+};
+
+//! For Invoice End
+
 export {
   //? Users Export
   createUser, updateUser, deleteUserById, deleteAllUsers,
@@ -414,5 +467,8 @@ export {
   createCart, updateCart,
 
   // ? Contact
-  createContact, deleteContactById, deleteAllContact
+  createContact, deleteContactById, deleteAllContact,
+
+  // ? Invoice
+  createInvoice, deleteInvoiceById, deleteAllInvoice
 };

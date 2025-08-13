@@ -14,12 +14,13 @@ import { useSortable } from '../component/common';
 
 export default function TicketPage() {
   const [tickets, setTickets] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('all'); // ✅ new state
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [formData, setFormData] = useState({ ticket_id: '', subject: '', status: '' });
-  const { sortedData: filteredTickets, sortConfig, handleSort } = useSortable(tickets);
+  const { sortedData, sortConfig, handleSort } = useSortable(tickets);
 
   const statusLabels = {
     backlog: 'Backlog',
@@ -87,8 +88,13 @@ export default function TicketPage() {
 
   const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const paginatedTickets = filteredTickets.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  const totalPages = Math.ceil(filteredTickets.length / itemsPerPage);
+  // ✅ Apply filter before pagination
+  const filteredTicketsByStatus = sortedData.filter(ticket =>
+    statusFilter === 'all' ? true : ticket.status === statusFilter
+  );
+
+  const paginatedTickets = filteredTicketsByStatus.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(filteredTicketsByStatus.length / itemsPerPage);
 
   return (
     <div className="p-6 max-w-7xl mx-auto min-h-screen">
@@ -96,9 +102,24 @@ export default function TicketPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <h1 className="text-3xl font-bold text-gray-800">🎟 Ticket Management</h1>
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <span className="px-4 py-2 bg-pink-600 text-white rounded-lg shadow">Total: {tickets.length}</span>
-          <button onClick={openCreateModal} className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition">+ New Ticket</button>
+
+          {/* ✅ Status Filter Dropdown */}
+          <select
+            value={statusFilter}
+            onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
+            className="border p-2 rounded"
+          >
+            <option value="all">All Statuses</option>
+            {Object.entries(statusLabels).map(([key, label]) => (
+              <option key={key} value={key}>{label}</option>
+            ))}
+          </select>
+
+          <button onClick={openCreateModal} className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition">
+            + New Ticket
+          </button>
         </div>
       </div>
 
@@ -107,7 +128,7 @@ export default function TicketPage() {
         <table className="w-full text-left">
           <thead className="bg-gray-100">
             <tr>
-              {['Index', 'Subject', 'Status', 'Created At', 'Last Updated', 'Edit', 'Delete'].map((label, i) => (
+              {['Index', 'Subject', 'Status', 'Created At', 'Last Updated', 'Edit'].map((label, i) => (
                 <th
                   key={i}
                   className="px-4 py-3 border-b text-gray-700 font-semibold cursor-pointer"
@@ -135,11 +156,11 @@ export default function TicketPage() {
                     <FaEdit />
                   </button>
                 </td>
-                <td className="py-3 px-4 border-b">
+                {/* <td className="py-3 px-4 border-b">
                   <button onClick={() => deleteTicketById(ticket.ticket_id).then(getTickets)} className="text-red-600 hover:text-red-800">
                     <FaTrash />
                   </button>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>
