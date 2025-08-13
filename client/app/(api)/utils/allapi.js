@@ -405,18 +405,20 @@ const createInvoice = async (formData) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: formData.username,
-        email: formData.email,
-        number: formData.phone,
-        doj: formData.doj,
-        address: formData.address,
-        password: "123456",
-        c_password: "123456"
+        user_id: formData.user_id,
+        invoice_number: formData.invoice_number,
+        order_number: formData.order_number,
+        user_name: formData.user_name,
+        payment_method: formData.payment_method,
+        subtotal: formData.subtotal,
+        shipping: formData.shipping,
+        total: formData.total,
+        invoice_date: formData.invoice_date
       }),
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Failed to create user');
+    if (!res.ok) throw new Error(data.message || 'Failed to create invoice');
 
     return data;
   } catch (err) {

@@ -1,21 +1,38 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { fetchUpdatedCart } from '../../(api)/utils/showAllData';
+import { createInvoice } from '../../(api)/utils/allapi';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
 const CheckoutPage = () => {
-  const [userData, setUserData] = useState({ name: '', email: '', number: '', address: '' });
+  const [userData, setUserData] = useState({
+    firstName: '',
+    lastName: '',
+    street: '',
+    city: '',
+    phone: '',
+    email: '',
+    notes: ''
+  });
   const [cartItems, setCartItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState('card');
   const router = useRouter();
 
-  const [firstName, lastName] = userData.name?.split(' ') ?? ['', ''];
-  const [street, city] = userData.address?.split(',') ?? ['', ''];
-
   useEffect(() => {
     const localUser = JSON.parse(localStorage.getItem('user')) || {};
-    setUserData(localUser);
+    const [firstName, lastName] = localUser.name?.split(' ') ?? ['', ''];
+    const [street, city] = localUser.address?.split(',') ?? ['', ''];
+
+    setUserData({
+      firstName,
+      lastName,
+      street,
+      city,
+      phone: localUser.number || '',
+      email: localUser.email || '',
+      notes: ''
+    });
   }, []);
 
   const loadCart = async () => {
@@ -43,20 +60,40 @@ const CheckoutPage = () => {
       return acc + price * item.qty;
     }, 0);
 
-  const handlePlaceOrder = () => {
-    const order = {
-      user: userData,
-      cartItems,
-      total: calculateTotal(),
-      paymentMethod,
-      date: new Date().toISOString(),
-    };
-    localStorage.setItem('order', JSON.stringify(order));
+  const handleInputChange = (field, value) => {
+    setUserData(prev => ({ ...prev, [field]: value }));
+  };
 
-    if (paymentMethod === 'cod') {
-      router.push('/product/invoice');
-    } else {
-      toast.info('Credit Card processing is mocked. Payment successful!');
+  const handlePlaceOrder = async () => {
+    const localUser = JSON.parse(localStorage.getItem('user')) || {};
+
+    const order = {
+      user_id: localUser.user_id,
+      invoice_number: `INV-${Date.now()}`,
+      order_number: `ORD-${Date.now()}`,
+      user_name: `${userData.firstName} ${userData.lastName}`,
+      email: userData.email,
+      phone: userData.phone,
+      address: `${userData.street}, ${userData.city}`,
+      notes: userData.notes,
+      payment_method: paymentMethod === 'card' ? 'Credit Card' : 'Cash on Delivery',
+      subtotal: calculateTotal(),
+      shipping: 150,
+      total: calculateTotal() + 150,
+      invoice_date: new Date().toISOString(),
+      products: cartItems
+    };
+
+    try {
+      const res = await createInvoice(order);
+      if (res?.invoice_id) {
+        toast.success('Invoice created successfully');
+        router.push(`/product/single-invoice?id=${res.invoice_id}`);
+      } else {
+        toast.error('Invoice created but no ID returned');
+      }
+    } catch (err) {
+      toast.error(err.message);
     }
   };
 
@@ -69,24 +106,63 @@ const CheckoutPage = () => {
           <h2 className="text-xl font-semibold mb-4">Billing Details</h2>
           <form className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
-              {[['First name *', firstName], ['Last name *', lastName]].map(([label, val], i) => (
-                <div key={i}>
-                  <label className="block mb-1">{label}</label>
-                  <input className="w-full border px-3 py-2 rounded" defaultValue={val} />
-                </div>
-              ))}
+              <div>
+                <label className="block mb-1">First name *</label>
+                <input
+                  className="w-full border px-3 py-2 rounded"
+                  value={userData.firstName}
+                  onChange={e => handleInputChange('firstName', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Last name *</label>
+                <input
+                  className="w-full border px-3 py-2 rounded"
+                  value={userData.lastName}
+                  onChange={e => handleInputChange('lastName', e.target.value)}
+                />
+              </div>
             </div>
-            {[['Street address *', street], ['Town / City *', city], ['Phone *', userData.number], ['Email address *', userData.email]].map(
-              ([label, val], i) => (
-                <div key={i}>
-                  <label className="block mb-1">{label}</label>
-                  <input className="w-full border px-3 py-2 rounded" defaultValue={val} />
-                </div>
-              )
-            )}
+            <div>
+              <label className="block mb-1">Street address *</label>
+              <input
+                className="w-full border px-3 py-2 rounded"
+                value={userData.street}
+                onChange={e => handleInputChange('street', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block mb-1">Town / City *</label>
+              <input
+                className="w-full border px-3 py-2 rounded"
+                value={userData.city}
+                onChange={e => handleInputChange('city', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block mb-1">Phone *</label>
+              <input
+                className="w-full border px-3 py-2 rounded"
+                value={userData.phone}
+                onChange={e => handleInputChange('phone', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block mb-1">Email address *</label>
+              <input
+                className="w-full border px-3 py-2 rounded"
+                value={userData.email}
+                onChange={e => handleInputChange('email', e.target.value)}
+              />
+            </div>
             <div>
               <label className="block mb-1">Order notes (optional)</label>
-              <textarea className="w-full border px-3 py-2 rounded" placeholder="Special notes for delivery" />
+              <textarea
+                className="w-full border px-3 py-2 rounded"
+                value={userData.notes}
+                onChange={e => handleInputChange('notes', e.target.value)}
+                placeholder="Special notes for delivery"
+              />
             </div>
           </form>
         </div>

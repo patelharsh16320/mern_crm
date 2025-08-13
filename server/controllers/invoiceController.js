@@ -105,8 +105,31 @@ const deleteAllInvoice = async (req, res) => {
     }
 }
 
+// Get Single Invoice by ID
+const SingleInvoice = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) { return res.status(400).json({ message: "Invoice ID is required" }); }
+
+        const sql = `SELECT * FROM invoice WHERE invoice_id = ?`;
+        conn.query(sql, [id], (err, results) => {
+            if (err) {
+                console.error("Database Error:", err);
+                return res.status(500).json({ message: 'Database error' });
+            }
+            if (!results.length) { return res.status(404).json({ message: 'Invoice not found' }); }
+
+            res.status(200).json({ message: "Invoice fetched successfully", data: results[0] });
+        });
+
+    } catch (err) {
+        console.error("Internal Error:", err);
+        res.status(500).json({ message: 'Internal server error on SingleInvoice' });
+    }
+};
+
 //! *************** Invoice API End 
 
 module.exports = {
-    createInvoice, updateInvoice, deleteInvoice, deleteAllInvoice
+    createInvoice, updateInvoice, deleteInvoice, deleteAllInvoice, SingleInvoice
 };

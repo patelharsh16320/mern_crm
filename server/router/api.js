@@ -6,7 +6,7 @@ const { createProduct, updateProduct, deleteProduct, deleteAllProduct, createCat
 const { updateRole, deleteRole, deleteAllRoles } = require('../controllers/roleController');
 const { getAllRecords } = require('../controllers/modelController')
 const { createCart, showDataOfCart, updateCart } = require('../controllers/cartController')
-const { createInvoice, updateInvoice, deleteInvoice, deleteAllInvoice } = require('../controllers/invoiceController')
+const { createInvoice, updateInvoice, deleteInvoice, deleteAllInvoice, SingleInvoice } = require('../controllers/invoiceController')
 const { createContact, deleteContact, deleteAllContact } = require('../controllers/contactController')
 const router = express.Router();
 
@@ -14,6 +14,7 @@ const router = express.Router();
 router.route('/').get(Home);
 router.get('/show-:table', getAllRecords);
 router.get('/cart-details/:user_id', showDataOfCart);
+router.get('/single-invoice/:id', SingleInvoice);
 
 //* Post API
 router.route('/create-user').post(createUser);

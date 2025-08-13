@@ -38,6 +38,19 @@ const fetchUpdatedCart = async (userId) => {
   }
 };
 
+const fetchSingleInvoice = async (invoiceId) => {
+  try {
+    const res = await fetch(`${BASE_URL}/single-invoice/${invoiceId}`, {
+      method: "GET",
+    });
+    if (!res.ok) throw new Error("Failed to fetch invoice");
+    return await res.json();
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+
 export {
-  fetchAllUsers, fetchAllTicket, fetchAllRole, fetchAllProduct, fetchAllProductCategory, fetchAllProductCategoryMap, fetchAllCart, fetchUpdatedCart, fetchAllContact, fetchAllInvoice
+  fetchAllUsers, fetchAllTicket, fetchAllRole, fetchAllProduct, fetchAllProductCategory, fetchAllProductCategoryMap, fetchAllCart, fetchUpdatedCart, fetchAllContact, fetchAllInvoice, fetchSingleInvoice
 };

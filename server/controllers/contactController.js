@@ -47,7 +47,6 @@ const conn = require('../utils/db');
 const createContact = async (req, res) => {
   try {
     const { user_id, name, email, number, message, created_at } = req.body;
-    console.log(req.body);
     
     if (!name || !email || !number || !message || !created_at) {
       return res.json({ message: "Fill All Details", statusCode: 400 });
@@ -82,10 +81,6 @@ const deleteContact = async (req, res) => {
     if (!contactId) {
       return res.json({ message: 'Contact id is required', statusCode: 400 });
     }
-
-    console.log('contactId', contactId);
-
-    console.log('contactId', contactId)
     const query = `DELETE FROM contacts WHERE contact_id = ?`;
 
     conn.query(query, [contactId], (err, result) => {
