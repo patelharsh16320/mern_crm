@@ -13,7 +13,6 @@ const getAllRecords = async (req, res) => {
       'product_category_map',
       'cart',
       'invoice',
-      'invoice_items',
       'contacts'
     ];
 
