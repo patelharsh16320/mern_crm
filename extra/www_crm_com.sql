@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 13, 2025 at 02:28 PM
+-- Generation Time: Aug 14, 2025 at 02:51 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.1.12
 
@@ -53,8 +53,7 @@ INSERT INTO `cart` (`cart_id`, `user_id`, `products_qty`, `created_at`) VALUES
 (1023, 12, '[{\"product_id\": 5, \"qty\": 3}, {\"product_id\": 6, \"qty\": 1}]', '2025-07-28 05:25:00'),
 (1024, 13, '[{\"product_id\": 7, \"qty\": 1}, {\"product_id\": 8, \"qty\": 2}]', '2025-07-28 05:30:00'),
 (1025, 14, '[{\"product_id\": 16, \"qty\": 1}]', '2025-07-28 05:35:00'),
-(1026, 15, '[{\"product_id\": 10, \"qty\": 2}, {\"product_id\": 11, \"qty\": 1}]', '2025-07-28 05:40:00'),
-(1027, 213, '[{\"product_id\":3,\"qty\":1},{\"product_id\":10,\"qty\":4}]', '2025-08-04 11:49:20');
+(1026, 15, '[{\"product_id\": 10, \"qty\": 2}, {\"product_id\": 11, \"qty\": 1}]', '2025-07-28 05:40:00');
 
 -- --------------------------------------------------------
 
@@ -115,7 +114,8 @@ INSERT INTO `invoice` (`invoice_id`, `user_id`, `invoice_number`, `order_number`
 (33, 213, 'INV-1755068188056', 'ORD-1755068188056', 'Deep Patel', 'Cash on Delivery', '579.99', '150.00', '729.99', '2025-08-13 06:56:28'),
 (34, 213, 'INV-1755068293387', 'ORD-1755068293387', 'Vatsal Ahir', 'Cash on Delivery', '579.99', '150.00', '729.99', '2025-08-13 06:58:13'),
 (35, 213, 'INV-1755068633608', 'ORD-1755068633608', 'Harsh Patel', 'Cash on Delivery', '579.99', '150.00', '729.99', '2025-08-13 07:03:53'),
-(36, 213, 'INV-1755087596127', 'ORD-1755087596127', 'Harsh Patel', 'Cash on Delivery', '579.99', '150.00', '729.99', '2025-08-13 12:19:56');
+(36, 213, 'INV-1755087596127', 'ORD-1755087596127', 'Harsh Patel', 'Cash on Delivery', '579.99', '150.00', '729.99', '2025-08-13 12:19:56'),
+(37, 213, 'INV-1755088898223', 'ORD-1755088898223', 'Harsh Patel', 'Cash on Delivery', '579.99', '150.00', '729.99', '2025-08-13 12:41:38');
 
 -- --------------------------------------------------------
 
@@ -297,9 +297,9 @@ INSERT INTO `ticket` (`ticket_id`, `subject`, `status`, `last_updated`, `created
 (102, 'Invoice Page Dynamic content', 'done', '2025-08-04 12:16:50', '2025-08-04 06:10:55'),
 (103, 'Checkout - after checkout database null', 'backlog', '2025-08-04 12:18:20', '2025-08-04 12:18:20'),
 (104, 'Database - Invoice', 'review', '2025-08-08 10:19:17', '2025-08-04 06:48:37'),
-(105, 'Invoice dynamic Data as per checkout details', 'in_progress', '2025-08-05 05:23:18', '2025-08-05 05:23:18'),
+(105, 'Invoice dynamic Data as per checkout details', 'review', '2025-08-13 12:32:26', '2025-08-04 23:53:18'),
 (106, 'Database - Invoice, invoice_items CRUD opration (Frontend- Backend)', 'review', '2025-08-08 10:19:22', '2025-08-04 23:53:55'),
-(107, 'Invoice - All Invoice Show', 'backlog', '2025-08-08 09:44:28', '2025-08-08 09:44:28'),
+(107, 'Invoice - All Invoice Show', 'in_progress', '2025-08-13 12:32:00', '2025-08-08 04:14:28'),
 (108, 'Contact - Admin All Messages Show', 'review', '2025-08-08 10:19:07', '2025-08-08 04:14:59'),
 (109, 'Contact - create new form - id not send issue', 'review', '2025-08-12 09:45:56', '2025-08-07 23:18:58'),
 (110, 'Login data Store in localsystems	', 'done', '2025-08-12 09:33:46', '2025-08-12 09:33:46'),
@@ -431,7 +431,7 @@ ALTER TABLE `contacts`
 -- AUTO_INCREMENT for table `invoice`
 --
 ALTER TABLE `invoice`
-  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `product`

@@ -1,0 +1,9 @@
+2025-08-14 12:01:39 [INFO]: [User:  | ID: ] GET /show-users - ::1
+2025-08-14 12:01:51 [INFO]: [User:  | ID: ] GET /show-users - ::1
+2025-08-14 12:01:54 [INFO]: [User:  | ID: ] GET /show-users - ::1
+2025-08-14 12:01:54 [INFO]: [User:  | ID: ] GET /show-users - ::1
+2025-08-14 12:02:03 [INFO]: [User:  | ID: ] GET /show-ticket - ::1
+2025-08-14 12:02:03 [INFO]: [User:  | ID: ] GET /show-ticket - ::1
+2025-08-14 12:02:36 [INFO]: [User:  | ID: ] GET /show-users - ::ffff:127.0.0.1
+2025-08-14 12:02:46 [INFO]: [User:  | ID: ] GET /show-ticket - ::1
+2025-08-14 12:02:46 [INFO]: [User:  | ID: ] GET /show-ticket - ::1

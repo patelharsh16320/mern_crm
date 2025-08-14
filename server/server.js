@@ -6,7 +6,7 @@ const cors = require('cors');
 const logRequests = require('./middleware/loggerMiddleware');
 
 app.use(cors({
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:3000','http://172.16.2.77:3000'],
     credentials: false
 }));
 app.use(logRequests);
