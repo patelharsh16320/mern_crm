@@ -5,7 +5,7 @@ const { createTicket, updateTicket, deleteTicket, deleteAllTickets } = require('
 const { createProduct, updateProduct, deleteProduct, deleteAllProduct, createCategory, updateCategory, deleteCategory, deleteAllCategories } = require('../controllers/productController');
 const { updateRole, deleteRole, deleteAllRoles } = require('../controllers/roleController');
 const { getAllRecords } = require('../controllers/modelController')
-const { createCart, showDataOfCart, updateCart } = require('../controllers/cartController')
+const { createCart, showDataOfCart, updateCart, deleteCart } = require('../controllers/cartController')
 const { createInvoice, updateInvoice, deleteInvoice, deleteAllInvoice, SingleInvoice } = require('../controllers/invoiceController')
 const { createContact, deleteContact, deleteAllContact } = require('../controllers/contactController')
 const router = express.Router();
@@ -48,6 +48,8 @@ router.route('/delete-allticket').delete(deleteAllTickets);
 
 router.route('/delete-role/:id').delete(deleteRole);
 router.route('/delete-allrole').delete(deleteAllRoles);
+
+router.route('/delete-cart/:id').delete(deleteCart);
 
 router.route('/delete-invoice/:id').delete(deleteInvoice);
 router.route('/delete-allinvoice').delete(deleteAllInvoice);

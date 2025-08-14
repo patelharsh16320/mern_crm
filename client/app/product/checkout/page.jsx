@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { fetchUpdatedCart } from '../../(api)/utils/showAllData';
-import { createInvoice } from '../../(api)/utils/allapi';
+import { createInvoice, deleteCartById } from '../../(api)/utils/allapi';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
@@ -88,6 +88,16 @@ const CheckoutPage = () => {
       const res = await createInvoice(order);
       if (res?.invoice_id) {
         toast.success('Invoice created successfully');
+
+        try {
+          await deleteCartById(localUser.user_id);
+          console.log('Cart deleted successfully');
+        } catch (err) {
+          console.error('Failed to delete cart:', err);
+          toast.error('Cart not deleted');
+        }
+        
+        // Redirect to single invoice page
         router.push(`/product/single-invoice?id=${res.invoice_id}`);
       } else {
         toast.error('Invoice created but no ID returned');

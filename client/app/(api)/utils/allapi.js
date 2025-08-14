@@ -316,6 +316,19 @@ const updateCart = async ({ user_id, products_qty }) => {
   }
 };
 
+// Delete Single Contact
+const deleteCartById = async (CartData) => {
+  const res = await fetch(`${BASE_URL}/delete-cart/${CartData}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to delete Cart");
+  }
+
+  return await res.json();
+};
+
 //! For Cart End
 
 //! For Contact Start
@@ -466,7 +479,7 @@ export {
   createNewProduct, updateProductById, deleteProductById, deleteAllProduct,
 
   // ? cart
-  createCart, updateCart,
+  createCart, updateCart, deleteCartById,
 
   // ? Contact
   createContact, deleteContactById, deleteAllContact,

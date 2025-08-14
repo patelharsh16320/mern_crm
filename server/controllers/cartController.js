@@ -71,49 +71,6 @@ const showDataOfCart = async (req, res) => {
 };
 
 //* Create Cart
-// const createCart = async (req, res) => {
-//   try {
-//     const { user_id, products_qty } = req.body;
-
-//     // Basic validation
-//     if (!user_id || !Array.isArray(products_qty)) {
-//       return res.status(400).json({
-//         message: "Missing user_id or products_qty must be an array",
-//         statusCode: 400
-//       });
-//     }
-
-//     // Convert to JSON string for MySQL JSON column
-//     const productsQtyJson = JSON.stringify(products_qty);
-
-//     const sql = `INSERT INTO cart (user_id, products_qty, created_at) VALUES (?, ?, NOW())`;
-
-//     const values = [user_id, productsQtyJson];
-
-//     conn.query(sql, values, (err, result) => {
-//       if (err) {
-//         console.error(err);
-//         return res.status(409).json({
-//           message: "Cart insert failed",
-//           statusCode: 409
-//         });
-//       }
-
-//       return res.status(201).json({
-//         message: "Cart created successfully",
-//         statusCode: 201,
-//         cart_id: result.insertId
-//       });
-//     });
-
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({
-//       message: "Internal server error while creating cart",
-//       statusCode: 500
-//     });
-//   }
-// };
 const createCart = async (req, res) => {
   try {
     const { user_id, products_qty } = req.body;
@@ -226,6 +183,35 @@ const updateCart = async (req, res) => {
   }
 };
 
+// Delete Cart
+const deleteCart = async (req, res) => {
+  try {
+    const cart_id = req.params.id;
+
+    if (!cart_id) {
+      return res.status(400).json({ message: 'cart id is required', statusCode: 400 });
+    }
+
+    const query = 'DELETE FROM `cart` WHERE `cart`.`cart_id` = ?';
+
+    conn.query(query, [cart_id], (err, result) => {
+      if (err) {
+        return res.status(500).json({ message: 'Database error', statusCode: 500 });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'Cart not found', statusCode: 404 });
+      }
+
+      res.status(200).json({ message: 'Cart deleted successfully', statusCode: 200 });
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: 'Internal server error on delete Cart', statusCode: 500 });
+  }
+};
+
+
 module.exports = {
-  showDataOfCart, createCart, updateCart
+  showDataOfCart, createCart, updateCart, deleteCart
 };
