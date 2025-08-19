@@ -1,186 +1,168 @@
 'use client';
-
 import React, { useEffect, useState } from 'react';
-import { fetchUpdatedCart } from '../../(api)/utils/showAllData';
-import { updateCart } from '../../(api)/utils/allapi';
+import { getCart, updateCart, deleteCartById } from '@/app/(api)/utils/allapi';
 import { toast } from 'react-toastify';
+import Link from 'next/link';
 
-const CartPage = () => {
-  const [cartItems, setCartItems] = useState([]);
+export default function CartPage() {
+  const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const loadCart = async () => {
-    try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      const userId = user?.user_id;
-      if (!userId) {
-        toast.error('User not found');
-        return;
-      }
-      const result = await fetchUpdatedCart(userId);
-      const cartWithQty = (result.data || []).map(item => ({
-        ...item,
-        qty: Number(item.qty),
-      }));
-      setCartItems(cartWithQty);
-      toast.success('Cart loaded');
-    } catch (err) {
-      toast.error('Failed to load cart');
-    }
-  };
-
+  // Fetch cart
   useEffect(() => {
-    loadCart();
+    const fetchCart = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user?.user_id) {
+          setCart([]);
+          setLoading(false);
+          return;
+        }
+        const res = await getCart(user.user_id);
+        if (res?.products) {
+          setCart(res.products);
+        } else {
+          setCart([]);
+        }
+      } catch (err) {
+        toast.error('Failed to fetch cart');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCart();
   }, []);
 
-  const handleQtyChange = (index, newQty) => {
-    const updatedItems = [...cartItems];
-    updatedItems[index].qty = Number(newQty);
-    setCartItems(updatedItems);
+  // Quantity Change
+  const handleQtyChange = async (productId, qty) => {
+    if (qty < 1) return;
+    const updated = cart.map((item) =>
+      item.product_id === productId ? { ...item, qty } : item
+    );
+    setCart(updated);
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    await updateCart({ user_id: user.user_id, products_qty: updated });
   };
 
-  const handleRemoveItem = (productId) => {
-    const updated = cartItems.filter(item => item.product_id !== productId);
-    setCartItems(updated);
+  // Remove Item
+  const handleRemove = async (productId) => {
+    const updated = cart.filter((item) => item.product_id !== productId);
+    setCart(updated);
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    await updateCart({ user_id: user.user_id, products_qty: updated });
+    toast.info('Item removed');
   };
 
-  const handleGoToCheckout = async () => {
-    try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      const userId = user?.user_id;
-
-      if (!userId) {
-        toast.error('User not found');
-        return;
-      }
-
-      const createdAt = '2025-07-28 14:45:00'; // Replace with dynamic value if needed
-
-      const products_qty = cartItems
-        .filter(item => item.qty > 0)
-        .map(item => ({
-          product_id: item.product_id,
-          qty: item.qty,
-        }));
-
-      const response = await updateCart({
-        user_id: userId,
-        products_qty,
-        created_at: createdAt,
-      });
-
-      if (response.statusCode === 200) {
-        toast.success('Cart updated before checkout');
-        window.location.href = '/product/checkout';
-      } else {
-        toast.error(response.message || 'Failed to update cart');
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('Something went wrong while updating cart');
-    }
-  };
-
-  const calculateTotalAmount = () => {
-    return cartItems.reduce((acc, item) => {
-      const finalPrice = item.sell_price && parseFloat(item.sell_price) > 0 && item.sell_price < item.price
-        ? item.sell_price
-        : item.price;
-      return acc + finalPrice * item.qty;
-    }, 0);
-  };
-
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-10 bg-gray-50 min-h-screen">
-      <h1 className="text-4xl font-bold text-gray-800 mb-10">🛒 Your Shopping Cart</h1>
-
-      {cartItems.length === 0 ? (
-        <div className="bg-white p-8 rounded-xl shadow text-center text-gray-500">
-          Your cart is empty. Start adding products!
-        </div>
-      ) : (
-        <div className="overflow-x-auto bg-white rounded-xl shadow border">
-          <table className="min-w-full table-auto">
-            <thead className="bg-gray-100 text-gray-700 text-sm uppercase tracking-wide">
-              <tr>
-                <th className="px-6 py-4 text-left">#</th>
-                <th className="px-6 py-4 text-left">Product</th>
-                <th className="px-6 py-4 text-left">Price</th>
-                <th className="px-6 py-4 text-left">Quantity</th>
-                <th className="px-6 py-4 text-left">Total</th>
-              </tr>
-            </thead>
-            <tbody className="text-gray-700">
-              {cartItems.map((item, i) => {
-                const sellPriceValid = item.sell_price && parseFloat(item.sell_price) > 0;
-                const hasDiscount = sellPriceValid && item.sell_price < item.price;
-                const finalPrice = hasDiscount ? item.sell_price : item.price;
-                const total = finalPrice * item.qty;
-
-                return (
-                  <tr
-                    key={i}
-                    className="border-t hover:bg-gray-50 transition"
-                  >
-                    <td className="px-6 py-4 font-semibold text-sm">{i + 1}</td>
-                    <td className="px-6 py-4">
-                      <div className="font-medium">{item.product_name}</div>
-                      {/* <div className="text-xs text-gray-400">ID: {item.product_id}</div> */}
-                    </td>
-                    <td className="px-6 py-4">
-                      {hasDiscount ? (
-                        <div>
-                          <span className="text-green-600 font-semibold">₹{item.sell_price}</span>
-                          <span className="line-through ml-2 text-sm text-gray-400">₹{item.price}</span>
-                        </div>
-                      ) : (
-                        <span className="text-gray-800 font-semibold">₹{item.price}</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          min="0"
-                          max="10"
-                          value={item.qty}
-                          onChange={(e) => handleQtyChange(i, e.target.value)}
-                          className="w-16 px-2 py-1 border border-gray-300 rounded text-center focus:outline-none focus:ring focus:border-blue-300"
-                        />
-                        {item.qty === 0 && (
-                          <button
-                            onClick={() => handleRemoveItem(item.product_id)}
-                            className="text-red-600 underline text-sm hover:text-red-800"
-                          >
-                            Remove
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 font-bold">₹{total.toFixed(2)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {cartItems.length > 0 && (
-        <div className="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="text-2xl font-semibold text-gray-800">
-            Total Amount: <span className="text-blue-600">₹{calculateTotalAmount().toFixed(2)}</span>
-          </div>
-          <button
-            onClick={handleGoToCheckout}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-xl shadow transition duration-200"
-          >
-            Proceed to Checkout →
-          </button>
-        </div>
-      )}
-    </div>
+  // Calculate total
+  const total = cart.reduce(
+    (sum, item) => sum + item.qty * Number(item.sell_price || item.price || 0),
+    0
   );
 
-};
+  if (loading) return <p className="text-center py-10">Loading...</p>;
 
-export default CartPage;
+  return (
+    <div className="min-h-screen bg-gray-50 py-10 px-4">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold text-gray-800 mb-10 text-center">
+          🛒 Your Shopping Cart
+        </h1>
+
+        {cart.length === 0 ? (
+          <div className="text-center bg-white p-10 rounded-2xl shadow-md">
+            <p className="text-gray-500 text-lg">Your cart is empty.</p>
+            <Link
+              href="/product"
+              className="mt-6 inline-block px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition"
+            >
+              🛍️ Continue Shopping
+            </Link>
+          </div>
+        ) : (
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              {cart.map((item) => (
+                <div
+                  key={item.product_id}
+                  className="flex items-center bg-white p-5 rounded-2xl shadow-sm hover:shadow-md transition"
+                >
+
+                  <div className="ml-5 flex-1">
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      {item.product_name}
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      ₹{Number(item.sell_price || item.price).toFixed(2)}
+                    </p>
+
+                    <div className="flex items-center gap-3 mt-3">
+                      <button
+                        onClick={() =>
+                          handleQtyChange(item.product_id, item.qty - 1)
+                        }
+                        className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-lg"
+                      >
+                        -
+                      </button>
+                      <span className="px-4 py-1 bg-gray-100 rounded-lg">
+                        {item.qty}
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleQtyChange(item.product_id, item.qty + 1)
+                        }
+                        className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-lg"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-end">
+                    <span className="text-gray-700 font-medium">
+                      ₹{(item.qty * Number(item.sell_price || item.price)).toFixed(2)}
+                    </span>
+                    <button
+                      onClick={() => handleRemove(item.product_id)}
+                      className="mt-2 text-sm text-red-500 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl shadow-md h-fit">
+              <h3 className="text-xl font-semibold text-gray-800 mb-6">
+                Order Summary
+              </h3>
+              <div className="flex justify-between mb-4 text-gray-600">
+                <span>Subtotal</span>
+                <span>₹{total.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between mb-4 text-gray-600">
+                <span>Shipping</span>
+                <span className="text-green-600">Free</span>
+              </div>
+              <hr className="my-4" />
+              <div className="flex justify-between text-lg font-bold text-gray-800 mb-6">
+                <span>Total</span>
+                <span>₹{total.toFixed(2)}</span>
+              </div>
+
+              <Link
+                href="/product/checkout"
+                className="w-full inline-block px-6 py-3 text-center bg-green-600 text-white rounded-xl hover:bg-green-700 transition"
+              >
+                ✅ Proceed to Checkout
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

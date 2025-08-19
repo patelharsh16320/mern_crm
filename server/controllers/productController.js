@@ -151,6 +151,29 @@ const deleteAllProduct = async (req, res) => {
     }
 }
 
+// Get Single Invoice by ID
+const SingleProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) { return res.status(400).json({ message: "Invoice ID is required" }); }
+
+        const sql = `SELECT * FROM product WHERE product_id = ?`;
+        conn.query(sql, [id], (err, results) => {
+            if (err) {
+                console.error("Database Error:", err);
+                return res.status(500).json({ message: 'Database error' });
+            }
+            if (!results.length) { return res.status(404).json({ message: 'Product not found' }); }
+
+            res.status(200).json({ message: "Product fetched successfully", data: results[0] });
+        });
+
+    } catch (err) {
+        console.error("Internal Error:", err);
+        res.status(500).json({ message: 'Internal server error on SingleProduct' });
+    }
+};
+
 //! *************** Product API End 
 
 //! *************** Product Category API Start 
@@ -287,7 +310,7 @@ const deleteAllCategories = async (req, res) => {
 //! *************** Product Category API End 
 module.exports = {
     //* Product
-    createProduct, updateProduct, deleteProduct, deleteAllProduct,
+    createProduct, updateProduct, deleteProduct, deleteAllProduct, SingleProduct, 
     //* Product Category
     createCategory, updateCategory, deleteCategory, deleteAllCategories
 };

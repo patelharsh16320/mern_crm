@@ -253,7 +253,7 @@ const deleteAllProduct = async () => {
   });
 
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Failed to delete all ticket');
+  if (!res.ok) throw new Error(data.message || 'Failed to delete all Product');
   return data;
 };
 
@@ -327,6 +327,56 @@ const deleteCartById = async (CartData) => {
   }
 
   return await res.json();
+};
+
+// Get cart data as per user id
+const getCart = async (userId) => {
+  try {
+    const res = await fetch(`${BASE_URL}/cart-details/${userId}`, {
+      method: "GET",
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.warn("Get cart failed:", data.message || "Unknown error");
+      return null;
+    }
+
+    if (Array.isArray(data.data) && data.data.length > 0) {
+      // merge duplicates by product_id
+      const merged = data.data.reduce((acc, item) => {
+        if (!acc[item.product_id]) {
+          acc[item.product_id] = { ...item };
+        } else {
+          acc[item.product_id].qty += item.qty;
+        }
+        return acc;
+      }, {});
+
+      return {
+        cart_id: data.data[0].cart_id,
+        user_id: data.data[0].user_id,
+        products: Object.values(merged), // clean array
+      };
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error fetching cart:", error);
+    return null;
+  }
+};
+
+// Delete All Product
+const deleteAllCart = async () => {
+  const res = await fetch(`${BASE_URL}/delete-allcart`, {
+    method: 'DELETE',
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to delete all Cart');
+  return data;
 };
 
 //! For Cart End
@@ -479,7 +529,7 @@ export {
   createNewProduct, updateProductById, deleteProductById, deleteAllProduct,
 
   // ? cart
-  createCart, updateCart, deleteCartById,
+  createCart, updateCart, deleteCartById, getCart, deleteAllCart,
 
   // ? Contact
   createContact, deleteContactById, deleteAllContact,

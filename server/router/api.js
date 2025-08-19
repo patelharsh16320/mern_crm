@@ -2,10 +2,10 @@ const express = require('express');
 const { Home } = require('../controllers/auth');
 const { createUser, updateUser, deleteUser, deleteAllUsers, loginUser } = require('../controllers/userController');
 const { createTicket, updateTicket, deleteTicket, deleteAllTickets } = require('../controllers/ticketController');
-const { createProduct, updateProduct, deleteProduct, deleteAllProduct, createCategory, updateCategory, deleteCategory, deleteAllCategories } = require('../controllers/productController');
+const { createProduct, updateProduct, deleteProduct, deleteAllProduct, SingleProduct, createCategory, updateCategory, deleteCategory, deleteAllCategories } = require('../controllers/productController');
 const { updateRole, deleteRole, deleteAllRoles } = require('../controllers/roleController');
 const { getAllRecords } = require('../controllers/modelController')
-const { createCart, showDataOfCart, updateCart, deleteCart } = require('../controllers/cartController')
+const { createCart, showDataOfCart, updateCart, deleteCart, deleteAllCart } = require('../controllers/cartController')
 const { createInvoice, updateInvoice, deleteInvoice, deleteAllInvoice, SingleInvoice } = require('../controllers/invoiceController')
 const { createContact, deleteContact, deleteAllContact } = require('../controllers/contactController')
 const router = express.Router();
@@ -15,6 +15,7 @@ router.route('/').get(Home);
 router.get('/show-:table', getAllRecords);
 router.get('/cart-details/:user_id', showDataOfCart);
 router.get('/single-invoice/:id', SingleInvoice);
+router.get('/single-product/:id', SingleProduct);
 
 //* Post API
 router.route('/create-user').post(createUser);
@@ -50,6 +51,7 @@ router.route('/delete-role/:id').delete(deleteRole);
 router.route('/delete-allrole').delete(deleteAllRoles);
 
 router.route('/delete-cart/:id').delete(deleteCart);
+router.route('/delete-allcart').delete(deleteAllCart);
 
 router.route('/delete-invoice/:id').delete(deleteInvoice);
 router.route('/delete-allinvoice').delete(deleteAllInvoice);

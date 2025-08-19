@@ -5,6 +5,7 @@ import { deleteInvoiceById, deleteAllInvoice } from '../../../(api)/utils/allapi
 import { toast } from 'react-toastify';
 import { FaRegTrashAlt } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function InvoicePage() {
   const router = useRouter();
@@ -20,7 +21,8 @@ export default function InvoicePage() {
     "Shipping",
     "Total",
     "Date",
-    "Actions"
+    "Delete",
+    "View"
   ];
 
   useEffect(() => {
@@ -112,6 +114,14 @@ export default function InvoicePage() {
                       >
                         <FaRegTrashAlt />
                       </button>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Link
+                        href={`/show-admin/invoice/${inv.invoice_id}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {inv.invoice_number}
+                      </Link>
                     </td>
                   </tr>
                 ))

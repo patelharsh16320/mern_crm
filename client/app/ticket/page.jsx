@@ -14,12 +14,12 @@ import { useSortable } from '../component/common';
 
 export default function TicketPage() {
   const [tickets, setTickets] = useState([]);
-  const [statusFilter, setStatusFilter] = useState('all'); // ✅ new state
+  const [statusFilter, setStatusFilter] = useState('all'); 
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [formData, setFormData] = useState({ ticket_id: '', subject: '', status: '' });
+  const [formData, setFormData] = useState({ ticket_id: '', subject: '', status: 'backlog' }); // ✅ default backlog
   const { sortedData, sortConfig, handleSort } = useSortable(tickets);
 
   const statusLabels = {
@@ -52,7 +52,7 @@ export default function TicketPage() {
   };
 
   const openCreateModal = () => {
-    setFormData({ ticket_id: '', subject: '', status: '' });
+    setFormData({ ticket_id: '', subject: '', status: 'backlog' }); // ✅ default backlog
     setIsEditMode(false);
     setShowModal(true);
   };
@@ -72,7 +72,10 @@ export default function TicketPage() {
             old_ticket_id: formData.ticket_id,
             created_at: tickets.find(t => t.ticket_id === formData.ticket_id)?.created_at || new Date().toISOString(),
           })
-        : await createNewTicket({ subject: formData.subject, status: formData.status });
+        : await createNewTicket({
+            subject: formData.subject,
+            status: formData.status || 'backlog', // ✅ fallback if empty
+          });
 
       if ([200, 201].includes(result.statusCode)) {
         toast.success(result.message || 'Success');
@@ -88,7 +91,6 @@ export default function TicketPage() {
 
   const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
-  // ✅ Apply filter before pagination
   const filteredTicketsByStatus = sortedData.filter(ticket =>
     statusFilter === 'all' ? true : ticket.status === statusFilter
   );
@@ -105,7 +107,7 @@ export default function TicketPage() {
         <div className="flex gap-3 items-center">
           <span className="px-4 py-2 bg-pink-600 text-white rounded-lg shadow">Total: {tickets.length}</span>
 
-          {/* ✅ Status Filter Dropdown */}
+          {/* Status Filter Dropdown */}
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
@@ -156,11 +158,6 @@ export default function TicketPage() {
                     <FaEdit />
                   </button>
                 </td>
-                {/* <td className="py-3 px-4 border-b">
-                  <button onClick={() => deleteTicketById(ticket.ticket_id).then(getTickets)} className="text-red-600 hover:text-red-800">
-                    <FaTrash />
-                  </button>
-                </td> */}
               </tr>
             ))}
           </tbody>
@@ -184,9 +181,24 @@ export default function TicketPage() {
           <div className="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg relative">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">{isEditMode ? 'Update Ticket' : 'Create Ticket'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <input name="subject" value={formData.subject} onChange={handleChange} placeholder="Subject" required className="w-full border p-3 rounded focus:outline-none focus:ring focus:ring-blue-300" />
-              <select name="status" value={formData.status} onChange={handleChange} required className="w-full border p-3 rounded focus:outline-none focus:ring focus:ring-blue-300">
-                {Object.entries(statusLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+              <input 
+                name="subject" 
+                value={formData.subject} 
+                onChange={handleChange} 
+                placeholder="Subject" 
+                required 
+                className="w-full border p-3 rounded focus:outline-none focus:ring focus:ring-blue-300" 
+              />
+              <select 
+                name="status" 
+                value={formData.status} 
+                onChange={handleChange} 
+                required 
+                className="w-full border p-3 rounded focus:outline-none focus:ring focus:ring-blue-300"
+              >
+                {Object.entries(statusLabels).map(([key, label]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
               </select>
               <div className="flex justify-end gap-4">
                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border rounded bg-gray-100 hover:bg-gray-200">Cancel</button>

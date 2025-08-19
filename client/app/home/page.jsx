@@ -377,7 +377,6 @@ const App = () => {
         </motion.p>
       </footer>
 
-      {/* Custom CSS for pulse animations (Tailwind doesn't have these by default) */}
       <style>{`
         @keyframes pulse-slow {
           0%, 100% {

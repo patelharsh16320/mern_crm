@@ -10,7 +10,6 @@ import {
 import { fetchAllTicket } from '../../../(api)/utils/showAllData';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaEdit, FaRegTrashAlt, FaPlus, FaTrashAlt } from "react-icons/fa";
-import { useSortable } from '../../../component/common';
 
 export default function ShowAdmin() {
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -19,41 +18,87 @@ export default function ShowAdmin() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [formData, setFormData] = useState({ ticket_id: '', subject: '', status: '' });
-  const filteredData = selectedStatus === 'all'
-    ? tickets
-    : tickets.filter(ticket => ticket.status === selectedStatus);
 
-  const { sortedData: filteredTickets, sortConfig, handleSort } = useSortable(filteredData);
+  const [sortConfig, setSortConfig] = useState({ key: 'subject', direction: 'asc' });
+
+  const [formData, setFormData] = useState({
+    ticket_id: '',
+    subject: '',
+    status: 'backlog',   // ✅ default backlog
+  });
 
   const statusLabels = {
-    backlog: 'Backlog', to_do: 'To Do', in_progress: 'In Progress',
-    on_hold: 'On Hold', review: 'Review', done: 'Done',
+    backlog: 'Backlog',
+    to_do: 'To Do',
+    in_progress: 'In Progress',
+    on_hold: 'On Hold',
+    review: 'Review',
+    done: 'Done',
   };
+
   const statusColors = {
-    backlog: 'bg-gray-300 text-gray-800', to_do: 'bg-yellow-300 text-yellow-900',
-    in_progress: 'bg-blue-300 text-blue-900', on_hold: 'bg-red-300 text-red-900',
-    review: 'bg-yellow-200 text-yellow-800', done: 'bg-green-300 text-green-900',
+    backlog: 'bg-gray-300 text-gray-800',
+    to_do: 'bg-yellow-300 text-yellow-900',
+    in_progress: 'bg-blue-300 text-blue-900',
+    on_hold: 'bg-red-300 text-red-900',
+    review: 'bg-yellow-200 text-yellow-800',
+    done: 'bg-green-300 text-green-900',
   };
 
   useEffect(() => { getTickets(); }, []);
-  const paginatedTickets = filteredTickets.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
   const getTickets = async () => {
     try {
       const res = await fetchAllTicket();
       setTickets(res.users || []);
-    } catch { toast.error('Failed to fetch tickets'); }
+    } catch {
+      toast.error('Failed to fetch tickets');
+    }
+  };
+
+  // ✅ Status counts
+  const statusCounts = tickets.reduce((acc, t) => {
+    acc[t.status] = (acc[t.status] || 0) + 1;
+    return acc;
+  }, {});
+
+  // ✅ Filtering
+  const filteredData = selectedStatus === 'all'
+    ? tickets
+    : tickets.filter(ticket => ticket.status === selectedStatus);
+
+  // ✅ Sorting
+  const sortedData = [...filteredData].sort((a, b) => {
+    let aVal = a[sortConfig.key];
+    let bVal = b[sortConfig.key];
+
+    // Handle dates properly
+    if (sortConfig.key === 'created_at' || sortConfig.key === 'last_updated') {
+      aVal = new Date(aVal);
+      bVal = new Date(bVal);
+    }
+
+    if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const paginatedTickets = sortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const handleSort = (key) => {
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
   };
 
   const openCreateModal = () => {
-    setFormData({ ticket_id: '', subject: '', status: '' });
+    setFormData({ ticket_id: '', subject: '', status: 'backlog' });
     setIsEditMode(false);
     setShowModal(true);
   };
 
   const handleEdit = (t) => {
-    setFormData({ ticket_id: t.ticket_id, subject: t.subject, status: t.status });
+    setFormData({ ticket_id: t.ticket_id, subject: t.subject, status: t.status || 'backlog' });
     setIsEditMode(true);
     setShowModal(true);
   };
@@ -83,7 +128,7 @@ export default function ShowAdmin() {
       const commonData = {
         ticket_id: formData.ticket_id,
         subject: formData.subject,
-        status: formData.status,
+        status: formData.status || 'backlog',
         last_updated: new Date().toISOString(),
       };
 
@@ -111,23 +156,28 @@ export default function ShowAdmin() {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex justify-between mb-6 items-center">
+      <div className="flex flex-col md:flex-row justify-between mb-6 items-center gap-4">
         <h1 className="text-3xl font-bold text-gray-800">Ticket Management</h1>
-        <div className="mb-4 flex items-center gap-2">
-          <label htmlFor="statusFilter" className="font-medium text-gray-700">Filter by Status:</label>
+
+        {/* ✅ Status Filter with Counts */}
+        <div className="flex items-center gap-2">
+          <label htmlFor="statusFilter" className="font-medium text-gray-700">Status:</label>
           <select
             id="statusFilter"
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
             className="p-2 border border-gray-300 rounded-md shadow-sm"
           >
-            <option value="all">All</option>
+            <option value="all">All ({tickets.length})</option>
             {Object.entries(statusLabels).map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
+              <option key={value} value={value}>
+                {label} ({statusCounts[value] || 0})
+              </option>
             ))}
           </select>
         </div>
 
+        {/* Actions */}
         <div className="flex gap-3">
           <span className="px-4 py-2 bg-purple-600 text-white rounded-md shadow">Total: {tickets.length}</span>
           <button onClick={openCreateModal} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
@@ -144,15 +194,22 @@ export default function ShowAdmin() {
         <table className="min-w-full text-sm table-auto">
           <thead className="bg-gray-100">
             <tr>
-              {['#', 'Subject', 'Status', 'Created At', 'Last Updated', 'Actions'].map((h, i) => (
-                <th key={i} className="p-3 border text-left">
-                  {['Subject', 'Status'].includes(h) ? (
-                    <span onClick={() => handleSort(h.toLowerCase().replace(" ", "_"))} className="cursor-pointer">
-                      {h} {sortConfig.key === h.toLowerCase().replace(" ", "_") && (sortConfig.direction === 'asc' ? '▲' : '▼')}
-                    </span>
-                  ) : h}
+              <th className="p-3 border">#</th>
+              {[
+                { key: 'subject', label: 'Subject' },
+                { key: 'status', label: 'Status' },
+                { key: 'created_at', label: 'Created At' },
+                { key: 'last_updated', label: 'Last Updated' }
+              ].map(({ key, label }) => (
+                <th
+                  key={key}
+                  onClick={() => handleSort(key)}
+                  className="p-3 border text-left cursor-pointer select-none"
+                >
+                  {label} {sortConfig.key === key && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                 </th>
               ))}
+              <th className="p-3 border">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -180,10 +237,10 @@ export default function ShowAdmin() {
       {/* Pagination */}
       <div className="flex justify-center mt-4 gap-2">
         <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 border rounded disabled:opacity-50">Prev</button>
-        {Array.from({ length: Math.ceil(filteredTickets.length / itemsPerPage) }, (_, i) => (
+        {Array.from({ length: Math.ceil(sortedData.length / itemsPerPage) }, (_, i) => (
           <button key={i} onClick={() => setCurrentPage(i + 1)} className={`px-3 py-1 border rounded ${currentPage === i + 1 ? 'bg-blue-600 text-white' : ''}`}>{i + 1}</button>
         ))}
-        <button onClick={() => setCurrentPage(p => Math.min(p + 1, Math.ceil(filteredTickets.length / itemsPerPage)))} disabled={currentPage === Math.ceil(filteredTickets.length / itemsPerPage)} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
+        <button onClick={() => setCurrentPage(p => Math.min(p + 1, Math.ceil(sortedData.length / itemsPerPage)))} disabled={currentPage === Math.ceil(sortedData.length / itemsPerPage)} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
       </div>
 
       {/* Modal */}
@@ -192,19 +249,34 @@ export default function ShowAdmin() {
           <div className="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg relative">
             <h2 className="text-lg font-semibold mb-4 text-gray-800">{isEditMode ? 'Update Ticket' : 'Create New Ticket'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {['subject', 'status'].map((field) => (
-                <div key={field}>
-                  <label htmlFor={field} className="block text-sm font-medium text-gray-700 capitalize">{field}</label>
-                  {field === 'subject' ? (
-                    <input name={field} value={formData[field]} onChange={e => setFormData({ ...formData, [field]: e.target.value })} required className="mt-1 w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-blue-500" />
-                  ) : (
-                    <select name={field} value={formData[field]} onChange={e => setFormData({ ...formData, [field]: e.target.value })} required className="mt-1 w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-blue-500">
-                      {/* <option value="">Select status</option> */}
-                      {Object.entries(statusLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                    </select>
-                  )}
-                </div>
-              ))}
+              {/* Subject Input */}
+              <div>
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-700">Subject</label>
+                <input
+                  name="subject"
+                  value={formData.subject}
+                  onChange={e => setFormData({ ...formData, subject: e.target.value })}
+                  required
+                  className="mt-1 w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Status Dropdown */}
+              <div>
+                <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status</label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={e => setFormData({ ...formData, status: e.target.value })}
+                  required
+                  className="mt-1 w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-blue-500"
+                >
+                  {Object.entries(statusLabels).map(([k, v]) => (
+                    <option key={k} value={k}>{v}</option>
+                  ))}
+                </select>
+              </div>
+
               <div className="flex justify-end gap-3 pt-4">
                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-100">Cancel</button>
                 <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">{isEditMode ? 'Update' : 'Create'}</button>

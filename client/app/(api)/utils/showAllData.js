@@ -38,19 +38,35 @@ const fetchUpdatedCart = async (userId) => {
   }
 };
 
-const fetchSingleInvoice = async (invoiceId) => {
-  try {
-    const res = await fetch(`${BASE_URL}/single-invoice/${invoiceId}`, {
-      method: "GET",
-    });
-    if (!res.ok) throw new Error("Failed to fetch invoice");
-    return await res.json();
-  } catch (error) {
-    throw new Error(error.message);
-  }
-}
 
+const fetchInvoiceById = async (id) => {
+  const res = await fetch(`${BASE_URL}/single-invoice/${id}`, {
+    cache: 'no-store',
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch invoice: ${res.status}`);
+  }
+
+  const data = await res.json();
+  console.log('Invoice object: ', data.data);
+  return data.data;
+};
+
+const fetchProductById = async (id) => {
+  const res = await fetch(`${BASE_URL}/single-product/${id}`, {
+    cache: 'no-store',
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch Product: ${res.status}`);
+  }
+
+  const data = await res.json();
+  console.log('Product object: ', data.data);
+  return data.data;
+};
 
 export {
-  fetchAllUsers, fetchAllTicket, fetchAllRole, fetchAllProduct, fetchAllProductCategory, fetchAllProductCategoryMap, fetchAllCart, fetchUpdatedCart, fetchAllContact, fetchAllInvoice, fetchSingleInvoice
+  fetchAllUsers, fetchAllTicket, fetchAllRole, fetchAllProduct, fetchAllProductCategory, fetchAllProductCategoryMap, fetchAllCart, fetchUpdatedCart, fetchAllContact, fetchAllInvoice, fetchInvoiceById, fetchProductById
 };

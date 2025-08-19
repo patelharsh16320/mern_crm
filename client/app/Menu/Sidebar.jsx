@@ -18,7 +18,7 @@ const Sidebar = () => {
       title: 'Product',
       links: [
         { label: 'All Products', href: '/show-admin/product' },
-        { label: 'Add New', href: '/show-admin/product/add' },
+        { label: 'Add New', href: '/show-admin/product/add' }
       ],
     },
     {
@@ -28,7 +28,7 @@ const Sidebar = () => {
       ],
     },
     {
-      title: 'Invoice',
+      title: 'Invoice/ Orders',
       links: [
         { label: 'All Invoice', href: '/show-admin/invoice' },
       ],

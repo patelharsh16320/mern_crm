@@ -211,7 +211,18 @@ const deleteCart = async (req, res) => {
   }
 };
 
+// Delete All Cart
+const deleteAllCart = async (req, res) => {
+    try {
+        const query = `DELETE FROM cart WHERE 1`;
+        conn.query(query, (err, result) => {
+            res.json({ message: 'All art are deleted successfully', statusCode: 200 });
+        })
 
+    } catch (err) {
+        res.json({ message: 'Internal server error on delete art', statusCode: 500 });
+    }
+}
 module.exports = {
-  showDataOfCart, createCart, updateCart, deleteCart
+  showDataOfCart, createCart, updateCart, deleteCart, deleteAllCart
 };
