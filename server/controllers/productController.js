@@ -4,18 +4,18 @@ const conn = require('../utils/db');
 // Create new Product
 const createProduct = async (req, res) => {
     try {
-        const { name, desc, image_url, stock, price, sell_price, rating } = req.body;
+        const { name, desc, image_url, stock, price, sell_price, rating, wishlist } = req.body;
 
-        if (!name || !desc || !image_url || stock == null || price == null || sell_price == null || rating == null) {
+        if (!name || !desc || !image_url || stock == null || price == null || sell_price == null || rating == null || wishlist == null) {
             return res.status(400).json({
                 message: "Missing required product details",
                 statusCode: 400
             });
         }
 
-        const sql = ` INSERT INTO product ( name, \`desc\`, image_url, stock, price, sell_price, rating, created_at, modified_at, deleted_at ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NULL, NULL)        `;
+        const sql = ` INSERT INTO product ( name, \`desc\`, image_url, stock, price, sell_price, rating, wishlist, created_at, modified_at, deleted_at ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NULL, NULL)        `;
 
-        const values = [name, desc, image_url, stock, price, sell_price, rating];
+        const values = [name, desc, image_url, stock, price, sell_price, rating, wishlist];
 
         conn.query(sql, values, (err, result) => {
             if (err) {
@@ -45,51 +45,15 @@ const createProduct = async (req, res) => {
 // update new Product
 const updateProduct = async (req, res) => {
     try {
-        const {
-            product_id,
-            name,
-            desc,
-            image_url,
-            stock,
-            price,
-            sell_price,
-            rating,
-            created_at,
-            modified_at,
-            deleted_at
-        } = req.body;
+        const { product_id, name, desc, image_url, stock, price, sell_price, rating, wishlist, created_at, modified_at, deleted_at } = req.body;
 
-        // Validation
         if (!product_id) {
             return res.json({ message: "Product ID is required", statusCode: 400 });
         }
 
-        const sql = `UPDATE product SET 
-            name = ?, 
-            \`desc\` = ?, 
-            image_url = ?, 
-            stock = ?, 
-            price = ?, 
-            sell_price = ?, 
-            rating = ?, 
-            created_at = ?, 
-            modified_at = ?, 
-            deleted_at = ? 
-            WHERE product_id = ?`;
+        const sql = `UPDATE product SET name = ?, \`desc\` = ?, image_url = ?, stock = ?, price = ?, sell_price = ?, rating = ?, wishlist = ?, created_at = ?, modified_at = ?, deleted_at = ? WHERE product_id = ?`;
 
-        const values = [
-            name,
-            desc,
-            image_url,
-            stock,
-            price,
-            sell_price,
-            rating,
-            created_at,
-            modified_at,
-            deleted_at,
-            product_id
-        ];
+        const values = [name, desc, image_url, stock, price, sell_price, rating, wishlist ?? 0, created_at, modified_at, deleted_at, product_id];
 
         conn.query(sql, values, (err, result) => {
             if (err) {
@@ -310,7 +274,7 @@ const deleteAllCategories = async (req, res) => {
 //! *************** Product Category API End 
 module.exports = {
     //* Product
-    createProduct, updateProduct, deleteProduct, deleteAllProduct, SingleProduct, 
+    createProduct, updateProduct, deleteProduct, deleteAllProduct, SingleProduct,
     //* Product Category
     createCategory, updateCategory, deleteCategory, deleteAllCategories
 };

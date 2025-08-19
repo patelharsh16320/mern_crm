@@ -67,7 +67,7 @@ const AdminShowProduct = () => {
                         Total Products: {products.length}
                     </p>
                     <Link
-                        href="/product/show-admin/add"
+                        href="/show-admin/product/add"
                         className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md shadow transition"
                     >
                         + Add New Product
@@ -154,7 +154,7 @@ const AdminShowProduct = () => {
                                             <Link
                                                 className="text-blue-600 hover:text-blue-800"
                                                 href={{
-                                                    pathname: '/product/show-admin/add',
+                                                    pathname: '/show-admin/product/add',
                                                     query: { ...product },
                                                 }}
                                             >

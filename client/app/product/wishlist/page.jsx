@@ -1,38 +1,50 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { fetchAllProduct } from '../(api)/utils/showAllData';
-import { createCart, updateCart, getCart, updateProductById } from '../(api)/utils/allapi';
+import { fetchAllProduct } from '../../(api)/utils/showAllData';
+import { createCart, updateCart, getCart, updateProductById } from '../../(api)/utils/allapi';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { CiHeart } from "react-icons/ci";
 import { IoIosHeart } from "react-icons/io";
+import { gsap } from "gsap";
 
-const ProductPage = () => {
+const WishlistPage = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [wishlist, setWishlist] = useState({}); // store as object for toggle
+  const [wishlist, setWishlist] = useState({}); 
 
   const user = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user")) : null;
   const userId = user?.user_id;
 
-  // Fetch products & cart
+  // Animate page load
+  useEffect(() => {
+    gsap.from(".wishlist-card", {
+      opacity: 0,
+      y: 40,
+      duration: 0.6,
+      stagger: 0.15,
+      ease: "power3.out",
+    });
+  }, [products]);
+
+  // Fetch products
   useEffect(() => {
     fetchAllProduct()
       .then((res) => {
         const list = res.users || res.products || [];
-        setProducts(list);
+        const filtered = list.filter((p) => p.wishlist === 1);
+        setProducts(filtered);
 
-        // set wishlist state from DB values
         const wl = {};
-        list.forEach(p => {
-          wl[p.product_id] = p.wishlist === 1; 
+        filtered.forEach(p => {
+          wl[p.product_id] = p.wishlist === 1;
         });
         setWishlist(wl);
       })
-      .catch(() => toast.error("Failed to load products"));
+      .catch(() => toast.error("Failed to load wishlist"));
 
     const syncCart = async () => {
       if (!userId) return;
@@ -47,39 +59,33 @@ const ProductPage = () => {
     syncCart();
   }, [userId]);
 
-  // Toggle wishlist + call API
+  // Toggle wishlist
   const toggleWishlist = async (product) => {
     const newStatus = !wishlist[product.product_id];
-
-    // update UI instantly
-    setWishlist((prev) => ({
-      ...prev,
-      [product.product_id]: newStatus,
-    }));
+    setWishlist((prev) => ({ ...prev, [product.product_id]: newStatus }));
 
     try {
       await updateProductById({
         ...product,
         wishlist: newStatus ? 1 : 0,
       });
+
       toast.success(
         newStatus
           ? `${product.name || product.product_name} added to wishlist ❤️`
-          : `${product.name || product.product_name} removed from wishlist`
+          : `${product.name || product.product_name} removed`
       );
-    } catch (err) {
-      console.error("Wishlist update failed:", err);
-      toast.error("Failed to update wishlist");
 
-      // rollback on error
-      setWishlist((prev) => ({
-        ...prev,
-        [product.product_id]: !newStatus,
-      }));
+      if (!newStatus) {
+        setProducts((prev) => prev.filter((p) => p.product_id !== product.product_id));
+      }
+    } catch (err) {
+      toast.error("Failed to update wishlist");
+      setWishlist((prev) => ({ ...prev, [product.product_id]: !newStatus }));
     }
   };
 
-  // Add to Cart handler
+  // Add to Cart
   const addToCart = async (product) => {
     if (!userId) return toast.error("Please login to add items to cart");
 
@@ -87,34 +93,20 @@ const ProductPage = () => {
     try {
       const existingCart = await getCart(userId);
       let response;
-
       if (existingCart && existingCart.products.length > 0) {
-        // cart exists → update
         const updatedProducts = [...existingCart.products];
         const index = updatedProducts.findIndex((i) => i.product_id === product.product_id);
-
         if (index > -1) {
           updatedProducts[index].qty += 1;
         } else {
-          updatedProducts.push({
-            product_id: product.product_id,
-            qty: 1,
-            price: product.price,
-          });
+          updatedProducts.push({ product_id: product.product_id, qty: 1, price: product.price });
         }
-
-        response = await updateCart({
-          user_id: userId,
-          products_qty: updatedProducts,
-        });
+        response = await updateCart({ user_id: userId, products_qty: updatedProducts });
         setCart(updatedProducts);
       } else {
-        // no cart → create
         response = await createCart({
           user_id: userId,
-          products_qty: [
-            { product_id: product.product_id, qty: 1, price: product.price },
-          ],
+          products_qty: [{ product_id: product.product_id, qty: 1, price: product.price }],
         });
         setCart([{ product_id: product.product_id, qty: 1, price: product.price }]);
       }
@@ -122,54 +114,57 @@ const ProductPage = () => {
       if (response.statusCode === 200 || response.statusCode === 201) {
         toast.success(`${product.product_name || product.name} added to cart!`);
       } else {
-        toast.error(response.message || "Failed to add to cart");
+        toast.error("Failed to add to cart");
       }
-    } catch (err) {
-      console.error("Add to Cart Error:", err);
+    } catch {
       toast.error("Error adding to cart");
     } finally {
       setLoading(false);
     }
   };
 
-  // Get product qty from cart
   const getCartQty = (productId) => {
     const item = cart.find((c) => c.product_id === productId);
     return item ? item.qty : 0;
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 py-12 px-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-semibold text-gray-700 mb-10 text-center">
-          🛒 Shop Products
-        </h1>
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-extrabold text-gray-800 mb-4">❤️ My Wishlist</h1>
+          <p className="text-gray-500">All your favorite items saved in one place</p>
+        </div>
 
+        {/* Product Grid */}
         {products?.length ? (
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {products.map((product, index) => (
-              <motion.div
+          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {products.map((product) => (
+              <div
                 key={product.product_id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all relative"
+                className="wishlist-card bg-white border border-gray-100 rounded-2xl shadow-lg hover:shadow-2xl transition-transform transform hover:-translate-y-2 relative overflow-hidden group"
               >
-                {/* Wishlist Icon */}
+                {/* Wishlist Button */}
                 <button
                   onClick={() => toggleWishlist(product)}
-                  className="absolute top-3 right-3 text-2xl text-red-500 hover:scale-110 transition"
+                  className="absolute top-3 right-3 text-2xl text-red-500 hover:scale-125 transition"
                 >
                   {wishlist[product.product_id] ? <IoIosHeart /> : <CiHeart />}
                 </button>
 
-                <img
-                  src={product.image_url || "/placeholder.png"}
-                  alt={product.product_name || product.name}
-                  className="w-full h-48 object-cover rounded-t-2xl"
-                />
-                <div className="p-4 space-y-3">
-                  <h2 className="text-lg font-semibold text-gray-800">
+                {/* Product Image */}
+                <div className="overflow-hidden rounded-t-2xl">
+                  <img
+                    src={product.image_url || "/placeholder.png"}
+                    alt={product.product_name || product.name}
+                    className="w-full h-52 object-cover transform group-hover:scale-110 transition duration-500"
+                  />
+                </div>
+
+                {/* Product Details */}
+                <div className="p-5 space-y-3">
+                  <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
                     <Link href={`/product/${product.product_id}`}>
                       {product.product_name || product.name}
                     </Link>
@@ -179,7 +174,7 @@ const ProductPage = () => {
                   <div className="flex items-center space-x-2">
                     {product.sell_price && product.sell_price > 0 ? (
                       <>
-                        <span className="text-green-600 font-bold text-md">
+                        <span className="text-xl font-bold text-pink-600">
                           ₹{Number(product.sell_price).toFixed(2)}
                         </span>
                         <span className="text-gray-400 line-through text-sm">
@@ -187,18 +182,18 @@ const ProductPage = () => {
                         </span>
                       </>
                     ) : (
-                      <span className="text-green-600 font-bold text-md">
+                      <span className="text-xl font-bold text-pink-600">
                         ₹{Number(product.price).toFixed(2)}
                       </span>
                     )}
                   </div>
 
-                  {/* Add to Cart / Buy Now */}
-                  <div className="flex gap-2">
+                  {/* Buttons */}
+                  <div className="flex gap-2 mt-4">
                     <button
                       onClick={() => addToCart(product)}
                       disabled={loading}
-                      className="flex-1 px-3 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-xl font-medium transition disabled:opacity-50"
+                      className="flex-1 px-3 py-2 text-sm text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 rounded-xl font-medium shadow-md transition disabled:opacity-50"
                     >
                       {getCartQty(product.product_id) > 0
                         ? `Qty: ${getCartQty(product.product_id)}`
@@ -208,14 +203,14 @@ const ProductPage = () => {
                     </button>
                     <Link
                       href="/product/checkout"
-                      className="flex-1 px-3 py-2 text-sm text-green-600 bg-green-100 hover:bg-green-200 rounded-xl text-center font-medium transition"
+                      className="flex-1 px-3 py-2 text-sm text-purple-700 bg-purple-100 hover:bg-purple-200 rounded-xl text-center font-medium transition"
                     >
                       💳 Buy Now
                     </Link>
                   </div>
 
-                  {/* Rating + Stock */}
-                  <div className="flex justify-between text-xs text-gray-500 mt-2">
+                  {/* Rating & Stock */}
+                  <div className="flex justify-between text-xs text-gray-500 mt-3">
                     <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
                       ⭐ {product.rating || 0}
                     </span>
@@ -224,17 +219,15 @@ const ProductPage = () => {
                     </span>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-500 text-lg mt-12">
-            No products found.
-          </p>
+          <p className="text-center text-gray-500 text-lg mt-12">No wishlist items yet.</p>
         )}
       </div>
     </div>
   );
 };
 
-export default ProductPage;
+export default WishlistPage;

@@ -38,7 +38,6 @@ const fetchUpdatedCart = async (userId) => {
   }
 };
 
-
 const fetchInvoiceById = async (id) => {
   const res = await fetch(`${BASE_URL}/single-invoice/${id}`, {
     cache: 'no-store',
@@ -49,7 +48,6 @@ const fetchInvoiceById = async (id) => {
   }
 
   const data = await res.json();
-  console.log('Invoice object: ', data.data);
   return data.data;
 };
 

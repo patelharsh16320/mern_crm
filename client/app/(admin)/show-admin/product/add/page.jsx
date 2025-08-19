@@ -19,6 +19,7 @@ const ProductFormPage = () => {
     price: searchParams.get('price') || '',
     sell_price: searchParams.get('sell_price') || '',
     rating: searchParams.get('rating') || '',
+    wishlist: 0, // always default 0
     created_at: searchParams.get('created_at') || '',
     modified_at: new Date().toISOString(),
     deleted_at: null,
@@ -39,11 +40,13 @@ const ProductFormPage = () => {
     e.preventDefault();
 
     try {
+      const payload = { ...formData, wishlist: 0 }; // force wishlist = 0
+
       if (isEditMode) {
-        await updateProductById(formData);
+        await updateProductById(payload);
         toast.success('Product updated successfully!');
       } else {
-        await createNewProduct(formData);
+        await createNewProduct(payload);
         toast.success('Product created successfully!');
       }
 
